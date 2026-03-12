@@ -1,0 +1,118 @@
+/* === 优化原版CSS =============================== */
+/* 社交声誉优化：让警察局不超出避免挤开 */
+#faction-reputations {
+    grid-template-columns: unset
+}
+/* 社交农场优化：让四个排在一行 */
+#secondary-npcs .relation-box, #farm-status .relation-box {
+    min-width: 150px;
+    flex: 0 1 24%;
+}
+
+
+
+/* === 头像 =============================== */
+:root {
+    --story-bottom: 100px;
+}
+#story {
+    padding-bottom: var(--story-bottom);
+}
+#avatar-container {
+    pointer-events: none;
+    position: fixed;
+}
+#avatar-move {
+    pointer-events: all;
+    position: absolute;
+}
+
+
+
+/* === 浮动弹窗 =============================== */
+/* 金钱动态 */
+.money-box-list {
+    padding: 10px;
+    margin: 0.15rem;
+    margin-left: 50%;
+    font-weight: bold;
+    border: 1px solid var(--300);
+}
+.money-box-list > div {
+    display: flex;
+    justify-content: space-between;
+    color: var(--gold);
+}
+.money-box-list > #barmoney {
+    height: 2px;
+    background-color: var(--gold);
+    margin-block: -3px;
+}
+/* 全局动态 */
+.dynamicest-show {
+    opacity: 1;
+}
+.dynamicest-hide {
+    opacity: 0;
+}
+:root {
+    --dynamicest-display-top: 20px;
+}
+.display-dynamicest {
+    position: fixed;
+    right: 10px;
+    top: var(--dynamicest-display-top);
+    width: 80vw;
+    max-width: 400px;
+    z-index: 1001;  /* 高于成就 */
+    transition: opacity 0.8s ease;
+    overflow: auto;
+    max-height: stretch;
+}
+.display-dynamicest > .box-dynamicest > div {
+    min-width: 45%;
+}
+.display-dynamicest * {
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.box-dynamicest {
+    background-color: var(--850);
+    transition: opacity 0.8s ease;
+}
+.box-dynamicest .meter {
+    z-index: 0;
+}
+.box-dynamicest-stretch {
+    min-width: stretch !important;
+}
+.foldedDisplay-box-list {    /* 折叠 */
+    padding: 10px;
+    margin: 0.15rem;
+    cursor: pointer;
+    border: 1px solid var(--300);
+}
+/* 单独为特质加入边距 */
+.box-dynamicest.traits > .trait {
+    margin: 0.15rem;
+    flex-grow: 1;
+}
+
+
+
+/* === 状态美化 =============================== */
+/* 状态缓动 */
+.meter div {
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.8s ease;
+}
+/* 折叠状态框取消底部dot */
+mouse.tooltip-small, mouse.tooltip-centertop {
+    border-bottom: 0;
+}
+/* 配置stat底部状态条 */
+.stat .meter {
+    z-index: 0;
+    height: 2px;
+}
+.stat .meter div {
+    height: 2px;
+}

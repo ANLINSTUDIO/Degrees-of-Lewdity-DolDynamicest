@@ -1,0 +1,97 @@
+:: Setting Dynamicest [widget]
+
+<<widget "dynamicestModTab">>
+	<<button 极致动态>>
+		<<toggleTab>>
+		<<replace #customOverlayContent>><<dynamicestModSetting>><</replace>>
+	<</button>>
+<</widget>>
+
+<<widget "dynamicestModSetting">>
+	<details class="journal" open>
+		<summary class="journal">头像</summary>
+		<div class="settingsToggleItem">
+			<label>
+				<<print '<input type="checkbox" onchange="Dynamicest.settingAvatarEnable(this.checked)"'+($Dynamicest.Avatar?" checked":"")+'>'>>
+				启用头像
+			</label>
+			<span class="tooltip-anchor linkBlue" tooltip="勾选后将在界面上额外显示可拖动的人物的图像。">(?)</span>
+		</div>
+		<div class="settingsToggleItem">
+			<label>
+				<<print '<input type="checkbox" onchange="Dynamicest.settingAvatarShowBorder(this.checked)"'+($Dynamicest.AvatarShowBorder?" checked":"")+'>'>>
+				显示头像区域框 (Debug)
+			</label>
+			<span class="tooltip-anchor linkBlue" tooltip="勾选后将在人物的图像上显示可拖动区域。">(?)</span>
+		</div>
+		<div class="settingsToggleItem">
+			<label>
+				<<print '<input type="checkbox" onchange="Dynamicest.settingLock(this.checked)"'+($Dynamicest.Locked?" checked":"")+'>'>>
+				锁定头像位置
+			</label>
+			<span class="tooltip-anchor linkBlue" tooltip="勾选后头像将无法被移动，且会穿透拖动事件。">(?)</span>
+		</div>
+		<div class="settingsToggleItem">
+			<input type="button" value="重置头像位置" onclick='Dynamicest.settingResetPos()'/>
+		</div>
+		<div class="settingsToggleItemWide">
+			头像缩放
+			<span class="tooltip-anchor linkBlue" tooltip="允许调节额外显示的头像的缩放比例。注意，缩放可能导致质量较差。">(?)</span>
+			<br>
+			<<numberslider "$Dynamicest.AvatarScale" $Dynamicest.AvatarScale 0.5 1.5 0.1>>
+			<br><br>
+			<input type="button" value="设置" onclick='Dynamicest.settingAvatarScale()'/>
+			<input type="button" value="重设" onclick='Dynamicest.settingAvatarScale(1)'/>
+		</div>
+		<div class="settingsToggleItemWide">
+			故事区域底部额外间隔
+			<span class="tooltip-anchor linkBlue" tooltip="允许调节故事区域底部的空白大小，以便不被头像遮挡">(?)</span>
+			<br>
+			<<numberslider "$Dynamicest.AvatarStoryBottom" $Dynamicest.AvatarStoryBottom 0 500 1>>
+			<br><br>
+			<input type="button" value="设置" onclick='Dynamicest.settingStoryBottom()'/>
+			<input type="button" value="重设" onclick='Dynamicest.settingStoryBottom(100)'/>
+		</div>
+	</details>
+	<details class="journal" open>
+		<summary class="journal">数值动态</summary>
+		<div class="settingsToggleItemWide">
+			距离顶部
+			<span class="tooltip-anchor linkBlue" tooltip="允许调节动态显示模块距离顶部的高度">(?)</span>
+			<br>
+			<<numberslider "$Dynamicest.DynamicestDisplayTop" $Dynamicest.DynamicestDisplayTop 0 500 1>>
+			<br><br>
+			<input type="button" value="设置" onclick='Dynamicest.settingDynamicestDisplayTop()'/>
+			<input type="button" value="重设" onclick='Dynamicest.settingDynamicestDisplayTop(10)'/>
+		</div>
+		<div class="settingsGrid">
+			<div class="settingsHeader options">「属性」键过滤</div>
+			<<for _characteristic range Dynamicest.getFilterOptions("Characteristics")>>
+				<div class="settingsToggleItem">
+					<label>
+						<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Characteristics`, `'+_characteristic+'`, this.checked)"'+Dynamicest.getFilter("Characteristics", _characteristic)+'>'>>
+						<<print _characteristic>>
+					</label>
+				</div>
+			<</for>>
+			<div class="settingsHeader options">「社交」键过滤</div>
+			<<for _relation range Dynamicest.getFilterOptions("Relations")>>
+				<div class="settingsToggleItem">
+					<label>
+						<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Relations`, `'+_relation+'`, this.checked)"'+Dynamicest.getFilter("Relations", _relation)+'>'>>
+						<<print _relation>>
+					</label>
+				</div>
+			<</for>>
+			<div class="settingsHeader options">「特性」键过滤</div>
+			<<for _trait range Dynamicest.getFilterOptions("Traits")>>
+				<div class="settingsToggleItem">
+					<label>
+						<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Traits`, `'+_trait+'`, this.checked)"'+Dynamicest.getFilter("Traits", _trait)+'>'>>
+						<<print _trait>>
+					</label>
+				</div>
+			<</for>>
+		</div>
+	</details>
+<</widget>>

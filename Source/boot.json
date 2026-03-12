@@ -1,0 +1,34 @@
+{
+    "name": "Dynamicest",
+    "nickName": "极致动态",
+    "version": "1.6.0",
+    "styleFileList": ["dynamicest.css"],
+    "scriptFileList": ["dynamicest.js"],
+    "tweeFileList": ["settings.twee"],
+    "imgFileList": [],
+    "addonPlugin": [
+        {
+            "modName": "TweeReplacer",
+            "addonName": "TweeReplacerAddon",
+            "modVersion": "^1.0.0",
+            "params": [
+                {
+                    "passage": "overlayReplace",
+                    "findRegex": "<<optionsinformation>><<\\/replace>>[\\s\\S]*?<<\\/button>>", 
+                    "regexFlag": "g",  
+                    "replace": "<<optionsinformation>><</replace>>\n\t\t<</button>><<dynamicestModTab>>"
+                }
+            ]
+        }
+    ],
+    "dependenceInfo": [
+        {
+            "modName": "ModLoader",
+            "version": "^2.31.2"
+        },
+        {
+            "modName": "TweeReplacer",
+            "version": "^1.0.0"
+        }
+    ]
+}
