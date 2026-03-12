@@ -9,51 +9,6 @@
 
 <<widget "dynamicestModSetting">>
 	<details class="journal" open>
-		<summary class="journal">头像</summary>
-		<div class="settingsToggleItem">
-			<label>
-				<<print '<input type="checkbox" onchange="Dynamicest.settingAvatarEnable(this.checked)"'+($Dynamicest.Avatar?" checked":"")+'>'>>
-				启用头像
-			</label>
-			<span class="tooltip-anchor linkBlue" tooltip="勾选后将在界面上额外显示可拖动的人物的图像。">(?)</span>
-		</div>
-		<div class="settingsToggleItem">
-			<label>
-				<<print '<input type="checkbox" onchange="Dynamicest.settingAvatarShowBorder(this.checked)"'+($Dynamicest.AvatarShowBorder?" checked":"")+'>'>>
-				显示头像区域框 (Debug)
-			</label>
-			<span class="tooltip-anchor linkBlue" tooltip="勾选后将在人物的图像上显示可拖动区域。">(?)</span>
-		</div>
-		<div class="settingsToggleItem">
-			<label>
-				<<print '<input type="checkbox" onchange="Dynamicest.settingLock(this.checked)"'+($Dynamicest.Locked?" checked":"")+'>'>>
-				锁定头像位置
-			</label>
-			<span class="tooltip-anchor linkBlue" tooltip="勾选后头像将无法被移动，且会穿透拖动事件。">(?)</span>
-		</div>
-		<div class="settingsToggleItem">
-			<input type="button" value="重置头像位置" onclick='Dynamicest.settingResetPos()'/>
-		</div>
-		<div class="settingsToggleItemWide">
-			头像缩放
-			<span class="tooltip-anchor linkBlue" tooltip="允许调节额外显示的头像的缩放比例。注意，缩放可能导致质量较差。">(?)</span>
-			<br>
-			<<numberslider "$Dynamicest.AvatarScale" $Dynamicest.AvatarScale 0.5 1.5 0.1>>
-			<br><br>
-			<input type="button" value="设置" onclick='Dynamicest.settingAvatarScale()'/>
-			<input type="button" value="重设" onclick='Dynamicest.settingAvatarScale(1)'/>
-		</div>
-		<div class="settingsToggleItemWide">
-			故事区域底部额外间隔
-			<span class="tooltip-anchor linkBlue" tooltip="允许调节故事区域底部的空白大小，以便不被头像遮挡">(?)</span>
-			<br>
-			<<numberslider "$Dynamicest.AvatarStoryBottom" $Dynamicest.AvatarStoryBottom 0 500 1>>
-			<br><br>
-			<input type="button" value="设置" onclick='Dynamicest.settingStoryBottom()'/>
-			<input type="button" value="重设" onclick='Dynamicest.settingStoryBottom(100)'/>
-		</div>
-	</details>
-	<details class="journal" open>
 		<summary class="journal">数值动态</summary>
 		<div class="settingsToggleItemWide">
 			距离顶部
