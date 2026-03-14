@@ -34,8 +34,9 @@ Dynamicest.onPassageRender = function (ev) {
     V.Dynamicest.Settings.FilterComdoms = V.Dynamicest.Settings.FilterComdoms || false;
     V.Dynamicest.Settings.FilterSpray = V.Dynamicest.Settings.FilterSpray || false;
 
+    V.Dynamicest.Settings.DynamicestDisplayPenetrate = V.Dynamicest.Settings.DynamicestDisplayPenetrate || false;
     V.Dynamicest.Settings.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop || 10;
-    Dynamicest.settingDynamicestDisplayTop();
+    Dynamicest.settingDynamicestDisplay();
 
     // 不允许首页出现，因为会导致首次判断出错
     if (V.passage === "Start") return;
@@ -736,11 +737,15 @@ Dynamicest.getFilter = function(slot, key) {
     return obj.includes(key) ? " checked" : "";
 };
 
+Dynamicest.settingDynamicestDisplay = function() {
+    document.documentElement.style.setProperty('--dynamicest-display-top', `${V.Dynamicest.Settings.DynamicestDisplayTop}px`);
+    document.documentElement.style.setProperty('--dynamicest-display-penetrate', `${V.Dynamicest.Settings.DynamicestDisplayPenetrate ? "none": "all"}`);
+};
 Dynamicest.settingDynamicestDisplayTop = function(a0) {
     if (a0) {
         V.Dynamicest.Settings.DynamicestDisplayTop = a0;
         document.getElementById("numberslider-input-dynamicestsettingsdynamicestdisplaytop").value = a0;
         document.getElementById("numberslider-value-dynamicestsettingsdynamicestdisplaytop").innerText = a0;
     }
-    document.documentElement.style.setProperty('--dynamicest-display-top', `${V.Dynamicest.Settings.DynamicestDisplayTop}px`);
+    Dynamicest.settingDynamicestDisplay()
 };

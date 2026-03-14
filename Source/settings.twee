@@ -19,6 +19,13 @@
 			<input type="button" value="设置" onclick='Dynamicest.settingDynamicestDisplayTop()'/>
 			<input type="button" value="重设" onclick='Dynamicest.settingDynamicestDisplayTop(10)'/>
 		</div>
+		<div class="settingsToggleItem">
+			<label>
+				<<checkbox "$Dynamicest.Settings.DynamicestDisplayPenetrate" false true autocheck>>
+				穿透点击
+			</label>
+			<span class="tooltip-anchor linkBlue" tooltip="勾选此项后可以穿过提醒弹窗点击文本内容（除了折叠的）">(?)</span>
+		</div>
 		<div class="settingsGrid">
 			<div class="settingsHeader options">特殊过滤</div>
 
