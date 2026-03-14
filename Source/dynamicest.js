@@ -2,6 +2,7 @@ window.Dynamicest = {}
 
 // === 数值存储 =================================
 Dynamicest.First = true;
+Dynamicest.Debug = false;
 Dynamicest.Finish = [];
 Dynamicest.DisplayFold = {};
 Dynamicest.DisplayFoldMax = 5;
@@ -11,6 +12,8 @@ Dynamicest.LastState = new Map();
 Dynamicest.LastCharacteristics = {};
 Dynamicest.LastRelations = {};
 Dynamicest.LastTraits = {};
+Dynamicest.LastJournals = {};
+Dynamicest.LastValues = {};
 
 
 // === 注入 =====================================
@@ -26,7 +29,12 @@ Dynamicest.onPassageRender = function (ev) {
     V.Dynamicest.Settings.FilterCharacteristics = V.Dynamicest.Settings.FilterCharacteristics || [];
     V.Dynamicest.Settings.FilterTraits = V.Dynamicest.Settings.FilterTraits || ["防晒霜"];
 
-    V.Dynamicest.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop || 10;
+    V.Dynamicest.Settings.FilterBodyTemperature = V.Dynamicest.Settings.FilterBodyTemperature || false;
+    V.Dynamicest.Settings.FilterOutside = V.Dynamicest.Settings.FilterOutside || false;
+    V.Dynamicest.Settings.FilterComdoms = V.Dynamicest.Settings.FilterComdoms || false;
+    V.Dynamicest.Settings.FilterSpray = V.Dynamicest.Settings.FilterSpray || false;
+
+    V.Dynamicest.Settings.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop || 10;
     Dynamicest.settingDynamicestDisplayTop();
 
     // 不允许首页出现，因为会导致首次判断出错
@@ -38,6 +46,7 @@ Dynamicest.onPassageRender = function (ev) {
     queueMicrotask(() => {
         Dynamicest.LoadStats();
         Dynamicest.LoadMoney();
+        Dynamicest.LoadValues();
 
         const runTask = (task) => {
             return new Promise(resolve => {
@@ -48,9 +57,11 @@ Dynamicest.onPassageRender = function (ev) {
             });
         };
         
-        runTask(() => runTask(() => Dynamicest.LoadSocial()))
+        runTask(() => {})
+            .then(() => runTask(() => Dynamicest.LoadJournals()))
+            .then(() => runTask(() => Dynamicest.LoadSocials()))
             .then(() => runTask(() => Dynamicest.LoadCharacteristics()))
-            .then(() => runTask(() => Dynamicest.LoadTrait()))
+            .then(() => runTask(() => Dynamicest.LoadTraits()))
             .then(() => runTask(() => {
                 Dynamicest.First = false;
                 Dynamicest.LoadFoldedDisplay();
@@ -113,7 +124,7 @@ Dynamicest.LoadMoney = function() {
         const relMoneyAbs = Math.abs(relMoney).toFixed(2);
         const isPositive = relMoney >= 0;
         
-        const list = Dynamicest.GetList("money", "money-box-list");
+        const list = Dynamicest.GetList("money", "money-box-list box-dynamicest-half");
         list.innerHTML = `
         <div>
             <span>转账</span>
@@ -255,7 +266,7 @@ Dynamicest.FinishList = function(id, delay) {
     id = id.trim();
     let list = document.querySelector(`#box-dynamicest-list-${id}`);
     Dynamicest.Finish.push(id);
-    if (list) {
+    if (list && !Dynamicest.Debug) {
         setTimeout(() => {
             if (Dynamicest.Finish.includes(id)) {
                 list.classList.add("dynamicest-hide");
@@ -339,7 +350,7 @@ Dynamicest.applyTransition = function(oldElement, newElement) {
 };
 
 // === 社交动态 =================================
-Dynamicest.LoadSocial = function() {
+Dynamicest.LoadSocials = function() {
     Dynamicest.social_div = document.createElement("div");
     new Wikifier(Dynamicest.social_div, "<<social>>");
     const display = {};
@@ -450,7 +461,7 @@ Dynamicest.LoadCharacteristics = function() {
 };
 
 // === 特质动态 =================================
-Dynamicest.LoadTrait = function() {
+Dynamicest.LoadTraits = function() {
     Dynamicest.trait_div = document.createElement("div");
     new Wikifier(Dynamicest.trait_div, "<<traits>>");
     const display = {};
@@ -494,6 +505,126 @@ Dynamicest.LoadTrait = function() {
             }
             Dynamicest.FinishList(trait_class_id, 1500)
         }
+    }
+};
+
+// === 日志动态 =================================
+Dynamicest.CheckJournal = function(key) {
+    if (!Dynamicest.LastJournals.hasOwnProperty(key) || V[key] === undefined) {
+        Dynamicest.LastJournals[key] = V[key];
+        return false;
+    }
+    if (Dynamicest.LastJournals[key] !== V[key]) {
+        Dynamicest.LastJournals[key] = V[key];
+        return true;
+    }
+    return false;
+};
+
+Dynamicest.LoadJournals = function() {
+    const Journals = [];
+
+    if (Dynamicest.CheckJournal("blackmoney")) Journals.push(`<<highicon>>价值<span class="green">£<<print $antiquemoney>></span>的赃物，你可以在黑市上将它们卖掉。`);
+    if (Dynamicest.CheckJournal("antiquemoney")) Journals.push(`<<museumicon>>价值<span class="green">£<<print $blackmoney>></span>的古董，你可以将它们卖给博物馆。`);
+    if (Dynamicest.CheckJournal("phials_held")) Journals.push(`<<icon "aphrodisiac.png">><span class="green">$phials_held</span>罐<<pluralise $phials_held "催情剂">>，你可以在麋鹿街出售<<pluralise $phials_held "它" "它们">>。`);
+    if (Dynamicest.CheckJournal("lurkers_held")) Journals.push(`<<birdicon "lurkers">><span class="green">$lurkers_held</span>个<<pluralise $lurkers_held "潜伏者">>。`);
+    if (Dynamicest.CheckJournal("milkshake")) Journals.push(`<<foodicon "milkshake">><span class="green">$milkshake</span>杯<<pluralise $milkshake "奶昔">>。`);
+    if (Dynamicest.CheckJournal("popcorn")) Journals.push(`<<foodicon "popcorn">><span class="green">$popcorn</span><<pluralise $popcorn "包">>爆米花。`);
+    if (Dynamicest.CheckJournal("panties_held")) Journals.push(`<span class="clothes-white"><<icon "clothes/plain_panties.png">></span> <<print $panties_held is 1 ? "一件" : "<span class='green'>$panties_held</span>件">>偷来的内衣。你可以在午餐时间到后操场出售<<pluralise $panties_held "它" "它们">>。`);
+
+    if (Dynamicest.CheckJournal("sciencelichenpark")) if (V.sciencelichenparkready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到公园的地衣了，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("sciencelichentemple")) if (V.sciencelichentempleready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了神殿中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("sciencelichendrain")) if (V.sciencelichendrainready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了下水道中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("sciencelichenlake")) if (V.sciencelichenlakeready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你找到了生长在湖底废墟中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("scienceshroomheart")) Journals.push(`<span @class="($scienceshroomheart is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomheart is 0 and $scienceshroomheartready is 0 ? 'black' : ''"> $scienceshroomheart/5 的心形蘑菇已被发现。</span>`);
+    if (Dynamicest.CheckJournal("scienceshroomwolf")) Journals.push(`<span @class="($scienceshroomwolf is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomwolf is 0 and $scienceshroomwolfready is 0 ? 'black' : ''"> $scienceshroomwolf/5 的狼菇已被发现。</span>`);
+    if (Dynamicest.CheckJournal("sciencephallus")) Journals.push(`<span @class="($sciencephallus is 10 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span> $sciencephallus/10 的性器已测量。`);
+
+    if (Dynamicest.CheckJournal("condoms") && !V.Dynamicest.Settings.FilterComdoms) Journals.push(`
+        <div style="display: flex">
+        <span class='meek' style="flex: 1; padding-left: 0.2em; text-align: left;">避孕套总数：$condoms</span>
+        <img draggable="false" src="img/ui/condom.png">
+        </div>`);
+    if (Dynamicest.CheckJournal("spray") && !V.Dynamicest.Settings.FilterSpray) Journals.push(`
+        <div style="display: flex">
+        <span class='def' style="flex: 1; padding-left: 0.2em; text-align: left;">防狼喷雾：$spray / $spraymax</span>
+        <div style="display: flex;">
+            <<for _i to 1; _i lte $spraymax; _i++>>
+                <<if $spray gte _i>>
+                    <img draggable="false" src="img/ui/pepperspray.png">
+                <<else>>
+                    <img draggable="false" src="img/ui/emptyspray.png">
+                <</if>>
+            <</for>>
+        </div>
+        </div>`);
+
+    if (Journals.length > 0) {
+        const list_div = Dynamicest.GetList("Journal", "traits");
+        
+        Journals.forEach(JournalText => {
+            const JournalDiv = document.createElement("div");
+            JournalDiv.className = "trait box-dynamicest-stretch";
+            new Wikifier(JournalDiv, JournalText);
+            list_div.append(JournalDiv);
+        })
+        
+        Dynamicest.FinishList("Journal", 2500);
+    }
+};
+
+// === 其他动态 =================================
+Dynamicest.CheckValue = function(key, value) {
+    if (!Dynamicest.LastValues.hasOwnProperty(key) || value === undefined) {
+        Dynamicest.LastValues[key] = value;
+        return false;
+    }
+    if (Dynamicest.LastValues[key] !== value) {
+        Dynamicest.LastValues[key] = value;
+        return true;
+    }
+    return false;
+};
+
+Dynamicest.LoadValues = function() {
+    const Values = [];
+    const funcs = [];
+
+    if (!V.Dynamicest.Settings.FilterBodyTemperature && Dynamicest.CheckValue("bodyTemperature", setup.WeatherDescriptions.bodyTemperature()+setup.WeatherDescriptions.bodyTemperatureChanges())) {
+        Values.push(`<div id="characterTemperatureDynamicest"><canvas width="32" height="24"></canvas></div>${setup.WeatherDescriptions.bodyTemperature()}<br>${setup.WeatherDescriptions.bodyTemperatureChanges()}`);
+        funcs.push(() => {
+            const characterTemperature = document.querySelector("#characterTemperature>canvas");
+            document.querySelector("#characterTemperatureDynamicest>canvas").getContext('2d').drawImage(
+                characterTemperature,
+                0, 0,
+                characterTemperature.width, characterTemperature.height,
+            );
+        })
+    }
+
+    if (!V.Dynamicest.Settings.FilterOutside && Dynamicest.CheckValue("outside", V.outside)) {
+        Values.push(`
+            <div>
+                <img class="icon_ui" src="img/ui/${V.outside ? "icon_open" : "icon_closed"}.png" style="${V.outside ? "transform: translateY(25%);" : ""}"> 
+                <span>
+                    ${V.outside ? "<<possessedWord '你'>>在室外。" : "<<possessedWord '你'>>在室内。"}
+                </span>
+            </div>`);
+    }
+
+    if (Values.length > 0) {
+        const list_div = Dynamicest.GetList("Value", "traits box-dynamicest-half");
+        
+        Values.forEach(ValueText => {
+            const ValueDiv = document.createElement("div");
+            ValueDiv.className = "trait box-dynamicest-stretch";
+            new Wikifier(ValueDiv, ValueText);
+            list_div.append(ValueDiv);
+        })
+
+        funcs.forEach(func => func())
+        
+        Dynamicest.FinishList("Value", 2500);
     }
 };
 
@@ -607,9 +738,9 @@ Dynamicest.getFilter = function(slot, key) {
 
 Dynamicest.settingDynamicestDisplayTop = function(a0) {
     if (a0) {
-        V.Dynamicest.DynamicestDisplayTop = a0;
-        document.getElementById("numberslider-input-dynamicestdisplaytop").value = a0;
-        document.getElementById("numberslider-value-dynamicestdisplaytop").innerText = a0;
+        V.Dynamicest.Settings.DynamicestDisplayTop = a0;
+        document.getElementById("numberslider-input-dynamicestsettingsdynamicestdisplaytop").value = a0;
+        document.getElementById("numberslider-value-dynamicestsettingsdynamicestdisplaytop").innerText = a0;
     }
-    document.documentElement.style.setProperty('--dynamicest-display-top', `${V.Dynamicest.DynamicestDisplayTop}px`);
+    document.documentElement.style.setProperty('--dynamicest-display-top', `${V.Dynamicest.Settings.DynamicestDisplayTop}px`);
 };

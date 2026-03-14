@@ -14,10 +14,41 @@
 			距离顶部
 			<span class="tooltip-anchor linkBlue" tooltip="允许调节动态显示模块距离顶部的高度">(?)</span>
 			<br>
-			<<numberslider "$Dynamicest.DynamicestDisplayTop" $Dynamicest.DynamicestDisplayTop 0 500 1>>
+			<<numberslider "$Dynamicest.Settings.DynamicestDisplayTop" $Dynamicest.Settings.DynamicestDisplayTop 0 500 1>>
 			<br><br>
 			<input type="button" value="设置" onclick='Dynamicest.settingDynamicestDisplayTop()'/>
 			<input type="button" value="重设" onclick='Dynamicest.settingDynamicestDisplayTop(10)'/>
+		</div>
+		<div class="settingsGrid">
+			<div class="settingsHeader options">特殊过滤</div>
+
+			<div class="settingsToggleItem">
+				<label>
+					<<checkbox "$Dynamicest.Settings.FilterBodyTemperature" false true autocheck>>
+					体温及其变化
+				</label>
+				<span class="tooltip-anchor linkBlue" tooltip="当玩家的体温或者体温的变化向改变时，将会动态提醒。">(?)</span>
+			</div>
+			<div class="settingsToggleItem">
+				<label>
+					<<checkbox "$Dynamicest.Settings.FilterOutside" false true autocheck>>
+					室内外变化
+				</label>
+				<span class="tooltip-anchor linkBlue" tooltip="当玩家从室内切换到室外或者反之时，将会动态提醒。">(?)</span>
+			</div>
+			<div class="settingsToggleItem">
+				<label>
+					<<checkbox "$Dynamicest.Settings.FilterComdoms" false true autocheck>>
+					避孕套变化
+				</label>
+			</div>
+			<div class="settingsToggleItem">
+				<label>
+					<<checkbox "$Dynamicest.Settings.FilterSpray" false true autocheck>>
+					防狼喷雾变化
+				</label>
+			</div>
+
 		</div>
 		<div class="settingsGrid">
 			<div class="settingsHeader options">「属性」键过滤</div>

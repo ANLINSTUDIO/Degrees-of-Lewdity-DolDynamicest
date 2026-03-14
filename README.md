@@ -8,6 +8,8 @@
 
 ### 本模组的目的是让玩家能够更加直观地看到数值的变化。
 
+最新版直接下载链接：[https://sb.alseece.top/2/?=DoL-Dynamicest](https://sb.alseece.top/2/?=DoL-Dynamicest)
+
 ------
 
 ## 【框架】不排斥
