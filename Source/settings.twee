@@ -8,8 +8,36 @@
 <</widget>>
 
 <<widget "dynamicestModSetting">>
-	<details class="journal" open>
-		<summary class="journal">数值动态</summary>
+	<div class="p-2 text-align-center">
+		<h3>极致动态 <<print window.modSC2DataManager?.getModLoader()?.getModZip("Dynamicest")?.modInfo?.version ?? "未知版本">></h3>
+		<img src="img/dynamicest/logo.png">
+		<div class="m-2">
+			<span class="gold">开发者：</span>
+			<span>ANLIN.STUDIO</span>
+		</div>
+		<div class="m-2">
+			<p class="gold m-0">Github发布页</p>
+			<a target="_blank" class="link-external" href="https://github.com/ANLINSTUDIO/Degrees-of-Lewdity-DolDynamicest" tabindex="0">Github /ANLINSTUDIO/Degrees-of-Lewdity-DolDynamicest</a>
+		</div>
+		<div class="m-2">
+			<p class="gold m-0">最新版本下载链接</p>
+			<a target="_blank" class="link-external" href="https://sb.alseece.top/2/?=DoL-Dynamicest" tabindex="0" 
+			data-remote="https://sb.alseece.top/2/value.php?key=DoL-Dynamicest-LastestVersion"
+			data-replace="true">正在获取最新版本……</a>
+			<div style="text-align: start;" 
+			data-remote="https://sb.alseece.top/2/value.php?key=DoL-Dynamicest-Notice"
+			data-replace="true">正在获取公告</div>
+			<<run Dynamicest.loadRemote()>>
+		</div>
+		<div class="m-2">
+			<p class="gold m-0">百度贴吧发布帖</p>
+			<a target="_blank" class="link-external" href="https://tieba.baidu.com/p/10532247085?fr=personpage" tabindex="0">动态美化 |动态数值/无需框架/完美兼容/模组也适配</a>
+		</div>
+	</div>
+	<br><br><br>
+	<div class="settingsGrid">
+		<div class="settingsHeader options">全局设置</div>
+
 		<div class="settingsToggleItemWide">
 			距离顶部
 			<span class="tooltip-anchor linkBlue" tooltip="允许调节动态显示模块距离顶部的高度">(?)</span>
@@ -26,65 +54,69 @@
 			</label>
 			<span class="tooltip-anchor linkBlue" tooltip="勾选此项后可以穿过提醒弹窗点击文本内容（除了折叠的）">(?)</span>
 		</div>
-		<div class="settingsGrid">
-			<div class="settingsHeader options">特殊过滤</div>
+	</div>
+	<div class="p-2 text-align-center">
+		<h3><span class="teal">键过滤</span>勾选后将不再显示相应的动态</h3>
+		<h5>可过滤的键列表为动态更新，只有曾经触发过某个键的动态，才能够对其进行过滤。</h5>
+	</div>
+	<div class="settingsGrid">
+		<div class="settingsHeader options">特殊过滤</div>
 
-			<div class="settingsToggleItem">
-				<label>
-					<<checkbox "$Dynamicest.Settings.FilterBodyTemperature" false true autocheck>>
-					体温及其变化
-				</label>
-				<span class="tooltip-anchor linkBlue" tooltip="当玩家的体温或者体温的变化向改变时，将会动态提醒。">(?)</span>
-			</div>
-			<div class="settingsToggleItem">
-				<label>
-					<<checkbox "$Dynamicest.Settings.FilterOutside" false true autocheck>>
-					室内外变化
-				</label>
-				<span class="tooltip-anchor linkBlue" tooltip="当玩家从室内切换到室外或者反之时，将会动态提醒。">(?)</span>
-			</div>
-			<div class="settingsToggleItem">
-				<label>
-					<<checkbox "$Dynamicest.Settings.FilterComdoms" false true autocheck>>
-					避孕套变化
-				</label>
-			</div>
-			<div class="settingsToggleItem">
-				<label>
-					<<checkbox "$Dynamicest.Settings.FilterSpray" false true autocheck>>
-					防狼喷雾变化
-				</label>
-			</div>
+		<div class="settingsToggleItem">
+			<label>
+				<<checkbox "$Dynamicest.Settings.FilterBodyTemperature" false true autocheck>>
+				体温及其变化
+			</label>
+			<span class="tooltip-anchor linkBlue" tooltip="当玩家的体温或者体温的变化向改变时，将会动态提醒。">(?)</span>
+		</div>
+		<div class="settingsToggleItem">
+			<label>
+				<<checkbox "$Dynamicest.Settings.FilterOutside" false true autocheck>>
+				室内外变化
+			</label>
+			<span class="tooltip-anchor linkBlue" tooltip="当玩家从室内切换到室外或者反之时，将会动态提醒。">(?)</span>
+		</div>
+		<div class="settingsToggleItem">
+			<label>
+				<<checkbox "$Dynamicest.Settings.FilterComdoms" false true autocheck>>
+				避孕套变化
+			</label>
+		</div>
+		<div class="settingsToggleItem">
+			<label>
+				<<checkbox "$Dynamicest.Settings.FilterSpray" false true autocheck>>
+				防狼喷雾变化
+			</label>
+		</div>
 
-		</div>
-		<div class="settingsGrid">
-			<div class="settingsHeader options">「属性」键过滤</div>
-			<<for _characteristic range Dynamicest.getFilterOptions("Characteristics")>>
-				<div class="settingsToggleItem">
-					<label>
-						<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Characteristics`, `'+_characteristic+'`, this.checked)"'+Dynamicest.getFilter("Characteristics", _characteristic)+'>'>>
-						<<print _characteristic>>
-					</label>
-				</div>
-			<</for>>
-			<div class="settingsHeader options">「社交」键过滤</div>
-			<<for _relation range Dynamicest.getFilterOptions("Relations")>>
-				<div class="settingsToggleItem">
-					<label>
-						<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Relations`, `'+_relation+'`, this.checked)"'+Dynamicest.getFilter("Relations", _relation)+'>'>>
-						<<print _relation>>
-					</label>
-				</div>
-			<</for>>
-			<div class="settingsHeader options">「特性」键过滤</div>
-			<<for _trait range Dynamicest.getFilterOptions("Traits")>>
-				<div class="settingsToggleItem">
-					<label>
-						<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Traits`, `'+_trait+'`, this.checked)"'+Dynamicest.getFilter("Traits", _trait)+'>'>>
-						<<print _trait>>
-					</label>
-				</div>
-			<</for>>
-		</div>
-	</details>
+	</div>
+	<div class="settingsGrid">
+		<div class="settingsHeader options">「属性」键过滤</div>
+		<<for _characteristic range Dynamicest.getFilterOptions("Characteristics")>>
+			<div class="settingsToggleItem">
+				<label>
+					<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Characteristics`, `'+_characteristic+'`, this.checked)"'+Dynamicest.getFilter("Characteristics", _characteristic)+'>'>>
+					<<print _characteristic>>
+				</label>
+			</div>
+		<</for>>
+		<div class="settingsHeader options">「社交」键过滤</div>
+		<<for _relation range Dynamicest.getFilterOptions("Relations")>>
+			<div class="settingsToggleItem">
+				<label>
+					<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Relations`, `'+_relation+'`, this.checked)"'+Dynamicest.getFilter("Relations", _relation)+'>'>>
+					<<print _relation>>
+				</label>
+			</div>
+		<</for>>
+		<div class="settingsHeader options">「特性」键过滤</div>
+		<<for _trait range Dynamicest.getFilterOptions("Traits")>>
+			<div class="settingsToggleItem">
+				<label>
+					<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Traits`, `'+_trait+'`, this.checked)"'+Dynamicest.getFilter("Traits", _trait)+'>'>>
+					<<print _trait>>
+				</label>
+			</div>
+		<</for>>
+	</div>
 <</widget>>

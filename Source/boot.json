@@ -5,7 +5,9 @@
     "styleFileList": ["dynamicest.css"],
     "scriptFileList": ["dynamicest.js"],
     "tweeFileList": ["settings.twee"],
-    "imgFileList": [],
+    "imgFileList": [
+        "img/dynamicest/logo.png"
+    ],
     "addonPlugin": [
         {
             "modName": "TweeReplacer",
@@ -19,9 +21,16 @@
                     "replace": "<<optionsinformation>><</replace>>\n\t\t<</button>><<dynamicestModTab>>"
                 }
             ]
+        },
+        {
+            "modName": "ModLoader DoL ImageLoaderHook",
+            "addonName": "ImageLoaderAddon",
+            "modVersion": "^2.3.0",
+            "params": []
         }
     ],
     "dependenceInfo": [
+        
         {
             "modName": "ModLoader",
             "version": "^2.31.2"
@@ -29,6 +38,10 @@
         {
             "modName": "TweeReplacer",
             "version": "^1.0.0"
+        },
+        {
+            "modName": "ModLoader DoL ImageLoaderHook",
+            "version": "^2.3.0"
         }
     ]
 }

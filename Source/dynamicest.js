@@ -34,7 +34,7 @@ Dynamicest.onPassageRender = function (ev) {
     V.Dynamicest.Settings.FilterComdoms = V.Dynamicest.Settings.FilterComdoms || false;
     V.Dynamicest.Settings.FilterSpray = V.Dynamicest.Settings.FilterSpray || false;
 
-    V.Dynamicest.Settings.DynamicestDisplayPenetrate = V.Dynamicest.Settings.DynamicestDisplayPenetrate || false;
+    V.Dynamicest.Settings.DynamicestDisplayPenetrate = V.Dynamicest.Settings.DynamicestDisplayPenetrate || true;
     V.Dynamicest.Settings.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop || 10;
     Dynamicest.settingDynamicestDisplay();
 
@@ -67,6 +67,29 @@ Dynamicest.onPassageRender = function (ev) {
                 Dynamicest.First = false;
                 Dynamicest.LoadFoldedDisplay();
             }));
+    });
+};
+
+Dynamicest.loadRemote = function() {
+    queueMicrotask(() => { 
+        document.querySelectorAll('[data-remote]').forEach(async element => {
+            try {
+            const response = await fetch(element.dataset.remote, {
+                mode: 'cors',
+                credentials: 'omit'
+            });
+            const data = await response.json();
+            if (!data.error) {
+                let content = data.value;
+                if (element.dataset.replace === 'true') {
+                content = content.replaceAll('\n', '<br>');
+                }
+                element.innerHTML = content;
+            }
+            } catch (error) {
+            element.innerHTML = element.dataset.error || '加载失败';
+            }
+        });
     });
 };
 
@@ -525,21 +548,21 @@ Dynamicest.CheckJournal = function(key) {
 Dynamicest.LoadJournals = function() {
     const Journals = [];
 
-    if (Dynamicest.CheckJournal("blackmoney")) Journals.push(`<<highicon>>价值<span class="green">£<<print $antiquemoney>></span>的赃物，你可以在黑市上将它们卖掉。`);
-    if (Dynamicest.CheckJournal("antiquemoney")) Journals.push(`<<museumicon>>价值<span class="green">£<<print $blackmoney>></span>的古董，你可以将它们卖给博物馆。`);
+    if (Dynamicest.CheckJournal("blackmoney")) Journals.push(`<<highicon>>价值<span class="green">£<<print $blackmoney>></span>的赃物，你可以在黑市上将它们卖掉。`);
+    if (Dynamicest.CheckJournal("antiquemoney")) Journals.push(`<<museumicon>>价值<span class="green">£<<print $antiquemoney>></span>的古董，你可以将它们卖给博物馆。`);
     if (Dynamicest.CheckJournal("phials_held")) Journals.push(`<<icon "aphrodisiac.png">><span class="green">$phials_held</span>罐<<pluralise $phials_held "催情剂">>，你可以在麋鹿街出售<<pluralise $phials_held "它" "它们">>。`);
     if (Dynamicest.CheckJournal("lurkers_held")) Journals.push(`<<birdicon "lurkers">><span class="green">$lurkers_held</span>个<<pluralise $lurkers_held "潜伏者">>。`);
     if (Dynamicest.CheckJournal("milkshake")) Journals.push(`<<foodicon "milkshake">><span class="green">$milkshake</span>杯<<pluralise $milkshake "奶昔">>。`);
     if (Dynamicest.CheckJournal("popcorn")) Journals.push(`<<foodicon "popcorn">><span class="green">$popcorn</span><<pluralise $popcorn "包">>爆米花。`);
     if (Dynamicest.CheckJournal("panties_held")) Journals.push(`<span class="clothes-white"><<icon "clothes/plain_panties.png">></span> <<print $panties_held is 1 ? "一件" : "<span class='green'>$panties_held</span>件">>偷来的内衣。你可以在午餐时间到后操场出售<<pluralise $panties_held "它" "它们">>。`);
 
-    if (Dynamicest.CheckJournal("sciencelichenpark")) if (V.sciencelichenparkready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到公园的地衣了，你需要在家或图书馆里把它记录到你的项目中。`)};
-    if (Dynamicest.CheckJournal("sciencelichentemple")) if (V.sciencelichentempleready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了神殿中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
-    if (Dynamicest.CheckJournal("sciencelichendrain")) if (V.sciencelichendrainready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了下水道中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
-    if (Dynamicest.CheckJournal("sciencelichenlake")) if (V.sciencelichenlakeready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你找到了生长在湖底废墟中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
-    if (Dynamicest.CheckJournal("scienceshroomheart")) Journals.push(`<span @class="($scienceshroomheart is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomheart is 0 and $scienceshroomheartready is 0 ? 'black' : ''"> $scienceshroomheart/5 的心形蘑菇已被发现。</span>`);
-    if (Dynamicest.CheckJournal("scienceshroomwolf")) Journals.push(`<span @class="($scienceshroomwolf is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomwolf is 0 and $scienceshroomwolfready is 0 ? 'black' : ''"> $scienceshroomwolf/5 的狼菇已被发现。</span>`);
-    if (Dynamicest.CheckJournal("sciencephallus")) Journals.push(`<span @class="($sciencephallus is 10 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span> $sciencephallus/10 的性器已测量。`);
+    if (Dynamicest.CheckJournal("sciencelichenpark")) if (V.sciencelichenpark === 1 && V.sciencelichenparkready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到公园的地衣了，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("sciencelichentemple")) if (V.sciencelichentemple === 1 && V.sciencelichentempleready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了神殿中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("sciencelichendrain")) if (V.sciencelichendrain === 1 && V.sciencelichendrainready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了下水道中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("sciencelichenlake")) if (V.sciencelichenlake === 1 && V.sciencelichenlakeready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你找到了生长在湖底废墟中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("scienceshroomheart")) if (V.scienceshroomheart) {Journals.push(`<span @class="($scienceshroomheart is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomheart is 0 and $scienceshroomheartready is 0 ? 'black' : ''"> $scienceshroomheart/5 的心形蘑菇已被发现。</span>`)};
+    if (Dynamicest.CheckJournal("scienceshroomwolf")) if (V.scienceshroomwolf) {Journals.push(`<span @class="($scienceshroomwolf is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomwolf is 0 and $scienceshroomwolfready is 0 ? 'black' : ''"> $scienceshroomwolf/5 的狼菇已被发现。</span>`)};
+    if (Dynamicest.CheckJournal("sciencephallus")) if (V.sciencephallus) {Journals.push(`<span @class="($sciencephallus is 10 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span> $sciencephallus/10 的性器已测量。`)};
 
     if (Dynamicest.CheckJournal("condoms") && !V.Dynamicest.Settings.FilterComdoms) Journals.push(`
         <div style="display: flex">
@@ -646,6 +669,7 @@ Dynamicest.UnfoldDisplay = function() {
     if (!Dynamicest.DisplayFoldClose && Dynamicest.CancelFinishList("foldedDisplay")) {
         const foldedDisplay = document.querySelector("#foldedDisplay");
         if (foldedDisplay) foldedDisplay.innerText = "关闭所有数值的改变";
+        document.documentElement.style.setProperty('--dynamicest-display-penetrate', 'all');
         Dynamicest.DisplayFoldClose = true;
 
         for (let key in Dynamicest.DisplayFold) {
@@ -661,6 +685,7 @@ Dynamicest.UnfoldDisplay = function() {
             }
         }
     } else {
+        Dynamicest.settingDynamicestDisplay();
         Dynamicest.FinishList("foldedDisplay", -800);
         for (let key in Dynamicest.DisplayFold) {
             let display = Dynamicest.DisplayFold[key]
