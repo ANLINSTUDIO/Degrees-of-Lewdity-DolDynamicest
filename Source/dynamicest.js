@@ -14,6 +14,8 @@ Dynamicest.LastRelations = {};
 Dynamicest.LastTraits = {};
 Dynamicest.LastJournals = {};
 Dynamicest.LastValues = {};
+Dynamicest.LastSides = [];
+Dynamicest.HistorySides = new Set();
 
 
 // === 注入 =====================================
@@ -25,9 +27,11 @@ Dynamicest.onPassageRender = function (ev) {
 
     // 设置
     V.Dynamicest.Settings = V.Dynamicest.Settings || {};
+    V.Dynamicest.Settings.EnableSides = V.Dynamicest.Settings.EnableSides || true;
     V.Dynamicest.Settings.FilterRelations = V.Dynamicest.Settings.FilterRelations || ["巨鹰 恐怖者"];
     V.Dynamicest.Settings.FilterCharacteristics = V.Dynamicest.Settings.FilterCharacteristics || [];
     V.Dynamicest.Settings.FilterTraits = V.Dynamicest.Settings.FilterTraits || ["防晒霜"];
+    V.Dynamicest.Settings.FilterSides = V.Dynamicest.Settings.FilterSides || [];
 
     V.Dynamicest.Settings.FilterBodyTemperature = V.Dynamicest.Settings.FilterBodyTemperature || false;
     V.Dynamicest.Settings.FilterOutside = V.Dynamicest.Settings.FilterOutside || false;
@@ -40,6 +44,7 @@ Dynamicest.onPassageRender = function (ev) {
 
     // 不允许首页出现，因为会导致首次判断出错
     if (V.passage === "Start") return;
+    if (V.passage.startsWith("ScarletBook")) return;  // 想象珍妮特时所有属性都会改变将导致界面卡死
     Dynamicest.ev = ev;
     Dynamicest.DisplayFold = {};
     Dynamicest.DisplayFoldClose = false;
@@ -59,6 +64,7 @@ Dynamicest.onPassageRender = function (ev) {
         };
         
         runTask(() => {})
+            .then(() => runTask(() => Dynamicest.LoadSides()))
             .then(() => runTask(() => Dynamicest.LoadJournals()))
             .then(() => runTask(() => Dynamicest.LoadSocials()))
             .then(() => runTask(() => Dynamicest.LoadCharacteristics()))
@@ -583,6 +589,40 @@ Dynamicest.LoadJournals = function() {
         </div>
         </div>`);
 
+    // 单独适配智能手机
+    const phones = V.Phone?.Owned ? V.Phone.Owned.map(item => item.id): null;
+    if (phones) {
+        phones.forEach(phoneid => {
+            if (Dynamicest.LastJournals["Phone.Owned"] && !Dynamicest.LastJournals["Phone.Owned"].contains(phoneid)) {
+                const phone = V.Phone.Owned.find(item => item.id === phoneid);
+                const info = PhoneMod?.getPhoneConditionInfo(phone);
+                Journals.push(`
+                    <<if ${phone.newnessmax > 0}>>
+                        [ ${PhoneMod?.getPhoneBattery(phone)}% ] 
+                    <<else>>
+                        [ --- ] 
+                    <</if>>
+                    一部${info.html}的 ${phone.model} ，官网售价为
+                    <span class='gold'>£${Math.round(PhoneMod?.getPhoneInfo(phone.model).price)}</span>。
+                    <<if ${phone.stolen}>>
+                        <span class='red'>盗窃得来</span>
+                        <<if ${phone.usable}>>
+                            <span class='yellow'>密码已重置</span>
+                        <<else>>
+                            <span class='red'>密码未知</span>
+                        <</if>>
+                    <<else>>
+                        <<if ${phone.second}>>
+                            <span class='yellow'>地下手机店购买</span>
+                        <<else>>
+                            <span class='green'>官方渠道购买</span>
+                        <</if>>
+                    <</if>>`);
+            }
+        })
+        Dynamicest.LastJournals["Phone.Owned"] = phones
+    }
+
     if (Journals.length > 0) {
         const list_div = Dynamicest.GetList("Journal", "traits");
         
@@ -595,6 +635,45 @@ Dynamicest.LoadJournals = function() {
         
         Dynamicest.FinishList("Journal", 2500);
     }
+};
+
+// === 侧栏动态 =================================
+Dynamicest.LoadSides = function() {
+    if (!V.Dynamicest.Settings.EnableSides) return;
+
+    const Sides = [];
+    const container = document.querySelector('#storyCaptionContent');
+    const targetElement = document.querySelector('#sidebar-look-description');
+    const elementsList = [];
+
+    if (container && targetElement) {
+        const children = container.children;
+        for (let child of children) {
+            if (child === targetElement) break;
+            if (!["<br>"].contains(child.outerHTML)) {
+                elementsList.push(child.innerHTML);
+                if (!Dynamicest.LastSides.contains(child.innerHTML)) {
+                    Sides.push(child.outerHTML);
+                }
+            }
+        }
+    }
+
+    if (Sides) {
+        const list_div = Dynamicest.GetList("Side", "traits");
+        
+        Sides.forEach(SideHtml => {
+            const SideDiv = document.createElement("div");
+            SideDiv.className = "trait box-dynamicest-stretch";
+            SideDiv.innerHTML = SideHtml;
+            list_div.append(SideDiv);
+        })
+        
+        Dynamicest.FinishList("Side", 2500);
+    }
+
+    Dynamicest.LastSides = elementsList;
+    Dynamicest.LastSides.forEach(v => Dynamicest.HistorySides.add(v));
 };
 
 // === 其他动态 =================================
@@ -737,6 +816,13 @@ Dynamicest.getFilterOptions = function(slot) {
             obj1 = V.Dynamicest.Settings.FilterTraits;
             obj2 = Dynamicest.LastTraits;
             break;
+        case "Sides":
+            obj1 = V.Dynamicest.Settings.FilterSides;
+            obj2 = {};
+            Dynamicest.HistorySides.forEach(value => {
+                obj2[value] = undefined
+            })
+            break;
         default:
             break;
     };
@@ -754,6 +840,9 @@ Dynamicest.getFilter = function(slot, key) {
             break;
         case "Traits":
             obj = V.Dynamicest.Settings.FilterTraits
+            break;
+        case "Sides":
+            obj = V.Dynamicest.Settings.FilterSides
             break;
         default:
             break;

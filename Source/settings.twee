@@ -10,7 +10,7 @@
 <<widget "dynamicestModSetting">>
 	<div class="p-2 text-align-center">
 		<h3>极致动态 <<print window.modSC2DataManager?.getModLoader()?.getModZip("Dynamicest")?.modInfo?.version ?? "未知版本">></h3>
-		<img src="img/dynamicest/logo.png">
+		<img src="img/dynamicest/logo.png" alt="此处不显示照片请检查Modloader中的BeautySelectorAddon是否启用了Dynamicest">
 		<div class="m-2">
 			<span class="gold">开发者：</span>
 			<span>ANLIN.STUDIO</span>
@@ -57,7 +57,8 @@
 	</div>
 	<div class="p-2 text-align-center">
 		<h3><span class="teal">键过滤</span>勾选后将不再显示相应的动态</h3>
-		<h5>可过滤的键列表为动态更新，只有曾经触发过某个键的动态，才能够对其进行过滤。</h5>
+		<span>可过滤的键列表为动态更新，只有曾经触发过某个键的动态，才能够对其进行过滤。</span><br>
+		<span>勾选的键过滤<span class="def">跟随存档</span>，这意味着如果你在某个存档后修改了设置，恢复那个存档将需要重新设置一次。</span>
 	</div>
 	<div class="settingsGrid">
 		<div class="settingsHeader options">特殊过滤</div>
@@ -91,6 +92,21 @@
 
 	</div>
 	<div class="settingsGrid">
+		<div class="settingsHeader options">「侧边栏」键过滤</div>
+		<div class="settingsToggleItemWide text-align-center">
+			<label>
+				<<checkbox "$Dynamicest.Settings.EnableSides" false true autocheck>>
+				<span class="gold">侧边栏动态提醒</span>
+			</label>
+		</div>
+		<<for _side range Dynamicest.getFilterOptions("Sides")>>
+			<div class="settingsToggleItem">
+				<label>
+					<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Sides`, `'+_side+'`, this.checked)"'+Dynamicest.getFilter("Sides", _side)+'>'>>
+					<<print _side>>
+				</label>
+			</div>
+		<</for>>
 		<div class="settingsHeader options">「属性」键过滤</div>
 		<<for _characteristic range Dynamicest.getFilterOptions("Characteristics")>>
 			<div class="settingsToggleItem">
@@ -119,4 +135,5 @@
 			</div>
 		<</for>>
 	</div>
+	<br><br>
 <</widget>>
