@@ -13,6 +13,7 @@ Dynamicest.LastCharacteristics = {};
 Dynamicest.LastRelations = {};
 Dynamicest.LastTraits = {};
 Dynamicest.LastJournals = {};
+Dynamicest.LastJournalsID = {};
 Dynamicest.LastValues = {};
 Dynamicest.LastSides = [];
 Dynamicest.HistorySides = new Set();
@@ -27,19 +28,20 @@ Dynamicest.onPassageRender = function (ev) {
 
     // 设置
     V.Dynamicest.Settings = V.Dynamicest.Settings || {};
-    V.Dynamicest.Settings.EnableSides = V.Dynamicest.Settings.EnableSides || true;
+    V.Dynamicest.Settings.EnableSides = V.Dynamicest.Settings.EnableSides ?? true;
     V.Dynamicest.Settings.FilterRelations = V.Dynamicest.Settings.FilterRelations || ["巨鹰 恐怖者"];
     V.Dynamicest.Settings.FilterCharacteristics = V.Dynamicest.Settings.FilterCharacteristics || [];
     V.Dynamicest.Settings.FilterTraits = V.Dynamicest.Settings.FilterTraits || ["防晒霜"];
+    V.Dynamicest.Settings.FilterJournals = V.Dynamicest.Settings.FilterJournals || [];
     V.Dynamicest.Settings.FilterSides = V.Dynamicest.Settings.FilterSides || [];
 
-    V.Dynamicest.Settings.FilterBodyTemperature = V.Dynamicest.Settings.FilterBodyTemperature || false;
-    V.Dynamicest.Settings.FilterOutside = V.Dynamicest.Settings.FilterOutside || false;
-    V.Dynamicest.Settings.FilterComdoms = V.Dynamicest.Settings.FilterComdoms || false;
-    V.Dynamicest.Settings.FilterSpray = V.Dynamicest.Settings.FilterSpray || false;
+    V.Dynamicest.Settings.FilterBodyTemperature = V.Dynamicest.Settings.FilterBodyTemperature ?? false;
+    V.Dynamicest.Settings.FilterOutside = V.Dynamicest.Settings.FilterOutside ?? false;
+    V.Dynamicest.Settings.FilterComdoms = V.Dynamicest.Settings.FilterComdoms ?? false;
+    V.Dynamicest.Settings.FilterSpray = V.Dynamicest.Settings.FilterSpray ?? false;
 
-    V.Dynamicest.Settings.DynamicestDisplayPenetrate = V.Dynamicest.Settings.DynamicestDisplayPenetrate || true;
-    V.Dynamicest.Settings.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop || 10;
+    V.Dynamicest.Settings.DynamicestDisplayPenetrate = V.Dynamicest.Settings.DynamicestDisplayPenetrate ?? true;
+    V.Dynamicest.Settings.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop ?? 10;
     Dynamicest.settingDynamicestDisplay();
 
     // 不允许首页出现，因为会导致首次判断出错
@@ -539,12 +541,14 @@ Dynamicest.LoadTraits = function() {
 };
 
 // === 日志动态 =================================
-Dynamicest.CheckJournal = function(key) {
+Dynamicest.CheckJournal = function(key, id=null) {
+    if (id && V.Dynamicest.Settings.FilterJournals.includes(id)) return false;
+
     if (!Dynamicest.LastJournals.hasOwnProperty(key) || V[key] === undefined) {
         Dynamicest.LastJournals[key] = V[key];
         return false;
-    }
-    if (Dynamicest.LastJournals[key] !== V[key]) {
+    } else if (Dynamicest.LastJournals[key] !== V[key]) {
+        if (id) Dynamicest.LastJournalsID[id] = undefined;
         Dynamicest.LastJournals[key] = V[key];
         return true;
     }
@@ -554,74 +558,58 @@ Dynamicest.CheckJournal = function(key) {
 Dynamicest.LoadJournals = function() {
     const Journals = [];
 
-    if (Dynamicest.CheckJournal("blackmoney")) Journals.push(`<<highicon>>价值<span class="green">£<<print $blackmoney>></span>的赃物，你可以在黑市上将它们卖掉。`);
-    if (Dynamicest.CheckJournal("antiquemoney")) Journals.push(`<<museumicon>>价值<span class="green">£<<print $antiquemoney>></span>的古董，你可以将它们卖给博物馆。`);
-    if (Dynamicest.CheckJournal("phials_held")) Journals.push(`<<icon "aphrodisiac.png">><span class="green">$phials_held</span>罐<<pluralise $phials_held "催情剂">>，你可以在麋鹿街出售<<pluralise $phials_held "它" "它们">>。`);
-    if (Dynamicest.CheckJournal("lurkers_held")) Journals.push(`<<birdicon "lurkers">><span class="green">$lurkers_held</span>个<<pluralise $lurkers_held "潜伏者">>。`);
-    if (Dynamicest.CheckJournal("milkshake")) Journals.push(`<<foodicon "milkshake">><span class="green">$milkshake</span>杯<<pluralise $milkshake "奶昔">>。`);
-    if (Dynamicest.CheckJournal("popcorn")) Journals.push(`<<foodicon "popcorn">><span class="green">$popcorn</span><<pluralise $popcorn "包">>爆米花。`);
-    if (Dynamicest.CheckJournal("panties_held")) Journals.push(`<span class="clothes-white"><<icon "clothes/plain_panties.png">></span> <<print $panties_held is 1 ? "一件" : "<span class='green'>$panties_held</span>件">>偷来的内衣。你可以在午餐时间到后操场出售<<pluralise $panties_held "它" "它们">>。`);
+    if (Dynamicest.CheckJournal("blackmoney", "赃物")) Journals.push(`<<highicon>>价值<span class="green">£<<print $blackmoney>></span>的赃物，你可以在黑市上将它们卖掉。`);
+    if (Dynamicest.CheckJournal("antiquemoney", "古董")) Journals.push(`<<museumicon>>价值<span class="green">£<<print $antiquemoney>></span>的古董，你可以将它们卖给博物馆。`);
+    if (Dynamicest.CheckJournal("phials_held", "催情剂")) Journals.push(`<<icon "aphrodisiac.png">><span class="green">$phials_held</span>罐<<pluralise $phials_held "催情剂">>，你可以在麋鹿街出售<<pluralise $phials_held "它" "它们">>。`);
+    if (Dynamicest.CheckJournal("lurkers_held", "潜伏者")) Journals.push(`<<birdicon "lurkers">><span class="green">$lurkers_held</span>个<<pluralise $lurkers_held "潜伏者">>。`);
+    if (Dynamicest.CheckJournal("milkshake", "奶昔")) Journals.push(`<<foodicon "milkshake">><span class="green">$milkshake</span>杯<<pluralise $milkshake "奶昔">>。`);
+    if (Dynamicest.CheckJournal("popcorn", "爆米花")) Journals.push(`<<foodicon "popcorn">><span class="green">$popcorn</span><<pluralise $popcorn "包">>爆米花。`);
+    if (Dynamicest.CheckJournal("panties_held", "偷来的内衣")) Journals.push(`<span class="clothes-white"><<icon "clothes/plain_panties.png">></span> <<print $panties_held is 1 ? "一件" : "<span class='green'>$panties_held</span>件">>偷来的内衣。你可以在午餐时间到后操场出售<<pluralise $panties_held "它" "它们">>。`);
 
-    if (Dynamicest.CheckJournal("sciencelichenpark")) if (V.sciencelichenpark === 1 && V.sciencelichenparkready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到公园的地衣了，你需要在家或图书馆里把它记录到你的项目中。`)};
-    if (Dynamicest.CheckJournal("sciencelichentemple")) if (V.sciencelichentemple === 1 && V.sciencelichentempleready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了神殿中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
-    if (Dynamicest.CheckJournal("sciencelichendrain")) if (V.sciencelichendrain === 1 && V.sciencelichendrainready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了下水道中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
-    if (Dynamicest.CheckJournal("sciencelichenlake")) if (V.sciencelichenlake === 1 && V.sciencelichenlakeready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你找到了生长在湖底废墟中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
-    if (Dynamicest.CheckJournal("scienceshroomheart")) if (V.scienceshroomheart) {Journals.push(`<span @class="($scienceshroomheart is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomheart is 0 and $scienceshroomheartready is 0 ? 'black' : ''"> $scienceshroomheart/5 的心形蘑菇已被发现。</span>`)};
-    if (Dynamicest.CheckJournal("scienceshroomwolf")) if (V.scienceshroomwolf) {Journals.push(`<span @class="($scienceshroomwolf is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomwolf is 0 and $scienceshroomwolfready is 0 ? 'black' : ''"> $scienceshroomwolf/5 的狼菇已被发现。</span>`)};
-    if (Dynamicest.CheckJournal("sciencephallus")) if (V.sciencephallus) {Journals.push(`<span @class="($sciencephallus is 10 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span> $sciencephallus/10 的性器已测量。`)};
-
-    if (Dynamicest.CheckJournal("condoms") && !V.Dynamicest.Settings.FilterComdoms) Journals.push(`
-        <div style="display: flex">
-        <span class='meek' style="flex: 1; padding-left: 0.2em; text-align: left;">避孕套总数：$condoms</span>
-        <img draggable="false" src="img/ui/condom.png">
-        </div>`);
-    if (Dynamicest.CheckJournal("spray") && !V.Dynamicest.Settings.FilterSpray) Journals.push(`
-        <div style="display: flex">
-        <span class='def' style="flex: 1; padding-left: 0.2em; text-align: left;">防狼喷雾：$spray / $spraymax</span>
-        <div style="display: flex;">
-            <<for _i to 1; _i lte $spraymax; _i++>>
-                <<if $spray gte _i>>
-                    <img draggable="false" src="img/ui/pepperspray.png">
-                <<else>>
-                    <img draggable="false" src="img/ui/emptyspray.png">
-                <</if>>
-            <</for>>
-        </div>
-        </div>`);
+    if (Dynamicest.CheckJournal("sciencelichenpark", "科学研究项目")) if (V.sciencelichenpark === 1 && V.sciencelichenparkready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到公园的地衣了，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("sciencelichentemple", "科学研究项目")) if (V.sciencelichentemple === 1 && V.sciencelichentempleready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了神殿中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("sciencelichendrain", "科学研究项目")) if (V.sciencelichendrain === 1 && V.sciencelichendrainready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你已经找到了下水道中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("sciencelichenlake", "科学研究项目")) if (V.sciencelichenlake === 1 && V.sciencelichenlakeready === 0) {Journals.push(`<span class='fa-icon fa-unselected'></span>你找到了生长在湖底废墟中的地衣，你需要在家或图书馆里把它记录到你的项目中。`)};
+    if (Dynamicest.CheckJournal("scienceshroomheart", "科学研究项目")) if (V.scienceshroomheart) {Journals.push(`<span @class="($scienceshroomheart is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomheart is 0 and $scienceshroomheartready is 0 ? 'black' : ''"> $scienceshroomheart/5 的心形蘑菇已被发现。</span>`)};
+    if (Dynamicest.CheckJournal("scienceshroomwolf", "科学研究项目")) if (V.scienceshroomwolf) {Journals.push(`<span @class="($scienceshroomwolf is 5 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span><span @class="$scienceshroomwolf is 0 and $scienceshroomwolfready is 0 ? 'black' : ''"> $scienceshroomwolf/5 的狼菇已被发现。</span>`)};
+    if (Dynamicest.CheckJournal("sciencephallus", "科学研究项目")) if (V.sciencephallus) {Journals.push(`<span @class="($sciencephallus is 10 ? 'fa-icon fa-selected' : 'fa-icon fa-unselected')"></span> $sciencephallus/10 的性器已测量。`)};
 
     // 单独适配智能手机
-    const phones = V.Phone?.Owned ? V.Phone.Owned.map(item => item.id): null;
-    if (phones) {
-        phones.forEach(phoneid => {
-            if (Dynamicest.LastJournals["Phone.Owned"] && !Dynamicest.LastJournals["Phone.Owned"].contains(phoneid)) {
-                const phone = V.Phone.Owned.find(item => item.id === phoneid);
-                const info = PhoneMod?.getPhoneConditionInfo(phone);
-                Journals.push(`
-                    <<if ${phone.newnessmax > 0}>>
-                        [ ${PhoneMod?.getPhoneBattery(phone)}% ] 
-                    <<else>>
-                        [ --- ] 
-                    <</if>>
-                    一部${info.html}的 ${phone.model} ，官网售价为
-                    <span class='gold'>£${Math.round(PhoneMod?.getPhoneInfo(phone.model).price)}</span>。
-                    <<if ${phone.stolen}>>
-                        <span class='red'>盗窃得来</span>
-                        <<if ${phone.usable}>>
-                            <span class='yellow'>密码已重置</span>
+    if (!V.Dynamicest.Settings.FilterJournals.includes("获得手机")) {
+        const phones = V.Phone?.Owned ? V.Phone.Owned.map(item => item.id): null;
+        if (phones) {
+            phones.forEach(phoneid => {
+                if (Dynamicest.LastJournals["Phone.Owned"] && !Dynamicest.LastJournals["Phone.Owned"].contains(phoneid)) {
+                    const phone = V.Phone.Owned.find(item => item.id === phoneid);
+                    const info = PhoneMod?.getPhoneConditionInfo(phone);
+                    Journals.push(`
+                        <<if ${phone.newnessmax > 0}>>
+                            [ ${PhoneMod?.getPhoneBattery(phone)}% ] 
                         <<else>>
-                            <span class='red'>密码未知</span>
+                            [ --- ] 
                         <</if>>
-                    <<else>>
-                        <<if ${phone.second}>>
-                            <span class='yellow'>地下手机店购买</span>
+                        一部${info.html}的 ${phone.model} ，官网售价为
+                        <span class='gold'>£${Math.round(PhoneMod?.getPhoneInfo(phone.model).price)}</span>。
+                        <<if ${phone.stolen}>>
+                            <span class='red'>盗窃得来</span>
+                            <<if ${phone.usable}>>
+                                <span class='yellow'>密码已重置</span>
+                            <<else>>
+                                <span class='red'>密码未知</span>
+                            <</if>>
                         <<else>>
-                            <span class='green'>官方渠道购买</span>
-                        <</if>>
-                    <</if>>`);
-            }
-        })
-        Dynamicest.LastJournals["Phone.Owned"] = phones
-    }
+                            <<if ${phone.second}>>
+                                <span class='yellow'>地下手机店购买</span>
+                            <<else>>
+                                <span class='green'>官方渠道购买</span>
+                            <</if>>
+                        <</if>>`);
+                }
+            });
+            Dynamicest.LastJournalsID["获得手机"] = undefined;
+            Dynamicest.LastJournals["Phone.Owned"] = phones;
+        }
+    };
 
     if (Journals.length > 0) {
         const list_div = Dynamicest.GetList("Journal", "traits");
@@ -693,6 +681,26 @@ Dynamicest.LoadValues = function() {
     const Values = [];
     const funcs = [];
 
+    if (!V.Dynamicest.Settings.FilterComdoms && Dynamicest.CheckValue("condoms", V.condoms)) Values.push(`
+        <div style="display: flex">
+            <span class='meek' style="flex: 1; padding-left: 0.2em; text-align: left;">避孕套总数：$condoms</span>
+            <img draggable="false" src="img/ui/condom.png">
+        </div>`);
+    
+    if (!V.Dynamicest.Settings.FilterSpray && Dynamicest.CheckValue("spray", V.spray)) Values.push(`
+        <div style="display: flex">
+            <span class='def' style="flex: 1; padding-left: 0.2em; text-align: left;">防狼喷雾：$spray / $spraymax</span>
+            <div style="display: flex;">
+                <<for _i to 1; _i lte $spraymax; _i++>>
+                    <<if $spray gte _i>>
+                        <img draggable="false" src="img/ui/pepperspray.png">
+                    <<else>>
+                        <img draggable="false" src="img/ui/emptyspray.png">
+                    <</if>>
+                <</for>>
+            </div>
+        </div>`);
+
     if (!V.Dynamicest.Settings.FilterBodyTemperature && Dynamicest.CheckValue("bodyTemperature", setup.WeatherDescriptions.bodyTemperature()+setup.WeatherDescriptions.bodyTemperatureChanges())) {
         Values.push(`<div id="characterTemperatureDynamicest"><canvas width="32" height="24"></canvas></div>${setup.WeatherDescriptions.bodyTemperature()}<br>${setup.WeatherDescriptions.bodyTemperatureChanges()}`);
         funcs.push(() => {
@@ -705,15 +713,13 @@ Dynamicest.LoadValues = function() {
         })
     }
 
-    if (!V.Dynamicest.Settings.FilterOutside && Dynamicest.CheckValue("outside", V.outside)) {
-        Values.push(`
-            <div>
-                <img class="icon_ui" src="img/ui/${V.outside ? "icon_open" : "icon_closed"}.png" style="${V.outside ? "transform: translateY(25%);" : ""}"> 
-                <span>
-                    ${V.outside ? "<<possessedWord '你'>>在室外。" : "<<possessedWord '你'>>在室内。"}
-                </span>
-            </div>`);
-    }
+    if (!V.Dynamicest.Settings.FilterOutside && Dynamicest.CheckValue("outside", V.outside))  Values.push(`
+        <div>
+            <img class="icon_ui" src="img/ui/${V.outside ? "icon_open" : "icon_closed"}.png" style="${V.outside ? "transform: translateY(25%);" : ""}"> 
+            <span>
+                ${V.outside ? "<<possessedWord '你'>>在室外。" : "<<possessedWord '你'>>在室内。"}
+            </span>
+        </div>`);
 
     if (Values.length > 0) {
         const list_div = Dynamicest.GetList("Value", "traits box-dynamicest-half");
@@ -776,34 +782,14 @@ Dynamicest.UnfoldDisplay = function() {
 };
 
 // === 设置 ====================================
-Dynamicest.settingFilter = function(slot, key, checked) {
-    console.log(slot, key, checked);
-    
-    let obj = {}
-    switch (slot) {
-        case "Characteristics":
-            obj = V.Dynamicest.Settings.FilterCharacteristics
-            break;
-        case "Relations":
-            obj = V.Dynamicest.Settings.FilterRelations
-            break;
-        case "Traits":
-            obj = V.Dynamicest.Settings.FilterTraits
-            break;
-        default:
-            break;
-    };
-
-    if (checked) {
-        obj.push(key);
-    } else {
-        V.Dynamicest.Settings[`Filter${slot}`] = obj.filter(i => i != key);
-    };
-}
-Dynamicest.getFilterOptions = function(slot) {
-    let obj1 = {}
+Dynamicest.getFilterObj = function(slot) {
+    let obj1 = []
     let obj2 = {}
     switch (slot) {
+        case "Journals":
+            obj1 = V.Dynamicest.Settings.FilterJournals;
+            obj2 = Dynamicest.LastJournalsID;
+            break;
         case "Characteristics":
             obj1 = V.Dynamicest.Settings.FilterCharacteristics;
             obj2 = Dynamicest.LastCharacteristics;
@@ -826,28 +812,22 @@ Dynamicest.getFilterOptions = function(slot) {
         default:
             break;
     };
-
+    return [obj1, obj2]
+};
+Dynamicest.settingFilter = function(slot, key, checked) {
+    const [obj, _] = Dynamicest.getFilterObj(slot);
+    if (checked) {
+        obj.push(key);
+    } else {
+        V.Dynamicest.Settings[`Filter${slot}`] = obj.filter(i => i != key);
+    };
+}
+Dynamicest.getFilterOptions = function(slot) {
+    const [obj1, obj2] = Dynamicest.getFilterObj(slot);
     return [...new Set([...obj1, ...Object.keys(obj2)])];
 }
 Dynamicest.getFilter = function(slot, key) {
-    let obj = {}
-    switch (slot) {
-        case "Characteristics":
-            obj = V.Dynamicest.Settings.FilterCharacteristics
-            break;
-        case "Relations":
-            obj = V.Dynamicest.Settings.FilterRelations
-            break;
-        case "Traits":
-            obj = V.Dynamicest.Settings.FilterTraits
-            break;
-        case "Sides":
-            obj = V.Dynamicest.Settings.FilterSides
-            break;
-        default:
-            break;
-    };
-
+    const [obj, _] = Dynamicest.getFilterObj(slot);
     return obj.includes(key) ? " checked" : "";
 };
 

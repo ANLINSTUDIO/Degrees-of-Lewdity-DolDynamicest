@@ -107,6 +107,19 @@
 				</label>
 			</div>
 		<</for>>
+	</div>
+	<div class="settingsGrid">
+		<div class="settingsHeader options">「日志」键过滤</div>
+		<<for _journal range Dynamicest.getFilterOptions("Journals")>>
+			<div class="settingsToggleItem">
+				<label>
+					<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Journals`, `'+_journal+'`, this.checked)"'+Dynamicest.getFilter("Journals", _journal)+'>'>>
+					<<print _journal>>
+				</label>
+			</div>
+		<</for>>
+	</div>
+	<div class="settingsGrid">
 		<div class="settingsHeader options">「属性」键过滤</div>
 		<<for _characteristic range Dynamicest.getFilterOptions("Characteristics")>>
 			<div class="settingsToggleItem">
@@ -116,6 +129,8 @@
 				</label>
 			</div>
 		<</for>>
+	</div>
+	<div class="settingsGrid">
 		<div class="settingsHeader options">「社交」键过滤</div>
 		<<for _relation range Dynamicest.getFilterOptions("Relations")>>
 			<div class="settingsToggleItem">
@@ -125,6 +140,8 @@
 				</label>
 			</div>
 		<</for>>
+	</div>
+	<div class="settingsGrid">
 		<div class="settingsHeader options">「特性」键过滤</div>
 		<<for _trait range Dynamicest.getFilterOptions("Traits")>>
 			<div class="settingsToggleItem">
