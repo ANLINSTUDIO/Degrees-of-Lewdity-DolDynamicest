@@ -38,6 +38,9 @@
     overflow: auto;
     max-height: stretch;
     pointer-events: var(--dynamicest-display-penetrate);
+    transform-origin: right top;
+    scale: var(--dynamicest-display-scale);
+    opacity: var(--dynamicest-display-opacity);
 }
 .display-dynamicest > .box-dynamicest > div {
     min-width: 45%;

@@ -42,6 +42,8 @@ Dynamicest.onPassageRender = function (ev) {
 
     V.Dynamicest.Settings.DynamicestDisplayPenetrate = V.Dynamicest.Settings.DynamicestDisplayPenetrate ?? true;
     V.Dynamicest.Settings.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop ?? 10;
+    V.Dynamicest.Settings.DynamicestDisplayScale = V.Dynamicest.Settings.DynamicestDisplayScale ?? 1.0;
+    V.Dynamicest.Settings.DynamicestDisplayOpacity = V.Dynamicest.Settings.DynamicestDisplayOpacity ?? 1.0;
     Dynamicest.settingDynamicestDisplay();
 
     // 不允许首页出现，因为会导致首次判断出错
@@ -833,13 +835,23 @@ Dynamicest.getFilter = function(slot, key) {
 
 Dynamicest.settingDynamicestDisplay = function() {
     document.documentElement.style.setProperty('--dynamicest-display-top', `${V.Dynamicest.Settings.DynamicestDisplayTop}px`);
+    document.documentElement.style.setProperty('--dynamicest-display-scale', `${V.Dynamicest.Settings.DynamicestDisplayScale}`);
+    document.documentElement.style.setProperty('--dynamicest-display-opacity', `${V.Dynamicest.Settings.DynamicestDisplayOpacity}`);
     document.documentElement.style.setProperty('--dynamicest-display-penetrate', `${V.Dynamicest.Settings.DynamicestDisplayPenetrate ? "none": "all"}`);
 };
-Dynamicest.settingDynamicestDisplayTop = function(a0) {
-    if (a0) {
-        V.Dynamicest.Settings.DynamicestDisplayTop = a0;
-        document.getElementById("numberslider-input-dynamicestsettingsdynamicestdisplaytop").value = a0;
-        document.getElementById("numberslider-value-dynamicestsettingsdynamicestdisplaytop").innerText = a0;
-    }
+Dynamicest.settingDynamicestDisplayApply = function() {
+    Dynamicest.settingDynamicestDisplay()
+};
+Dynamicest.settingDynamicestDisplayReset = function() {
+    V.Dynamicest.Settings.DynamicestDisplayTop = 10;
+    V.Dynamicest.Settings.DynamicestDisplayScale = 1.0;
+    V.Dynamicest.Settings.DynamicestDisplayOpacity = 1.0;
+    document.getElementById("numberslider-input-dynamicestsettingsdynamicestdisplaytop").value = V.Dynamicest.Settings.DynamicestDisplayTop;
+    document.getElementById("numberslider-value-dynamicestsettingsdynamicestdisplaytop").innerText = V.Dynamicest.Settings.DynamicestDisplayTop;
+    document.getElementById("numberslider-input-dynamicestsettingsdynamicestdisplayscale").value = V.Dynamicest.Settings.DynamicestDisplayScale;
+    document.getElementById("numberslider-value-dynamicestsettingsdynamicestdisplayscale").innerText = V.Dynamicest.Settings.DynamicestDisplayScale;
+    document.getElementById("numberslider-input-dynamicestsettingsdynamicestdisplayopacity").value = V.Dynamicest.Settings.DynamicestDisplayOpacity;
+    document.getElementById("numberslider-value-dynamicestsettingsdynamicestdisplayopacity").innerText = V.Dynamicest.Settings.DynamicestDisplayOpacity;
+
     Dynamicest.settingDynamicestDisplay()
 };

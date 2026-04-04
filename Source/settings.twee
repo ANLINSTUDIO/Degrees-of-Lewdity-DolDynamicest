@@ -43,9 +43,20 @@
 			<span class="tooltip-anchor linkBlue" tooltip="允许调节动态显示模块距离顶部的高度">(?)</span>
 			<br>
 			<<numberslider "$Dynamicest.Settings.DynamicestDisplayTop" $Dynamicest.Settings.DynamicestDisplayTop 0 500 1>>
-			<br><br>
-			<input type="button" value="设置" onclick='Dynamicest.settingDynamicestDisplayTop()'/>
-			<input type="button" value="重设" onclick='Dynamicest.settingDynamicestDisplayTop(10)'/>
+			<br>
+			比例调节
+			<span class="tooltip-anchor linkBlue" tooltip="允许调节动态显示模块的缩放比例">(?)</span>
+			<br>
+			<<numberslider "$Dynamicest.Settings.DynamicestDisplayScale" $Dynamicest.Settings.DynamicestDisplayScale 0.1 1 0.05>>
+			<br>
+			透明度
+			<span class="tooltip-anchor linkBlue" tooltip="允许调节动态显示模块的透明度">(?)</span>
+			<br>
+			<<numberslider "$Dynamicest.Settings.DynamicestDisplayOpacity" $Dynamicest.Settings.DynamicestDisplayOpacity 0.1 1 0.05>>
+			<br>
+			<br>
+			<input type="button" value="设置" onclick='Dynamicest.settingDynamicestDisplayApply()'/>
+			<input type="button" value="重设" onclick='Dynamicest.settingDynamicestDisplayReset()'/>
 		</div>
 		<div class="settingsToggleItem">
 			<label>
