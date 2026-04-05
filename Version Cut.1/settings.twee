@@ -1,0 +1,39 @@
+:: Setting Dynamicest [widget]
+
+<<widget "dynamicestModTab">>
+	<<button 极致动态>>
+		<<toggleTab>>
+		<<replace #customOverlayContent>><<dynamicestModSetting>><</replace>>
+	<</button>>
+<</widget>>
+
+<<widget "dynamicestModSetting">>
+	<div class="p-2 text-align-center">
+		<h3>极致动态 <<print window.modSC2DataManager?.getModLoader()?.getModZip("Dynamicest")?.modInfo?.version ?? "未知版本">></h3>
+		<div class='def'>此版本仅美化【状态条】，需要完整版请前往如下最新版下载链接</div>
+		<img src="img/dynamicest/logo.png" alt="此处不显示照片请检查Modloader中的BeautySelectorAddon是否启用了Dynamicest">
+		<div class="m-2">
+			<span class="gold">开发者：</span>
+			<span>ANLIN.STUDIO</span>
+		</div>
+		<div class="m-2">
+			<p class="gold m-0">Github发布页</p>
+			<a target="_blank" class="link-external" href="https://github.com/ANLINSTUDIO/Degrees-of-Lewdity-DolDynamicest" tabindex="0">Github /ANLINSTUDIO/Degrees-of-Lewdity-DolDynamicest</a>
+		</div>
+		<div class="m-2">
+			<p class="gold m-0">最新版本下载链接</p>
+			<a target="_blank" class="link-external" href="https://sb.alseece.top/2/?=DoL-Dynamicest" tabindex="0" 
+			data-remote="https://sb.alseece.top/2/value.php?key=DoL-Dynamicest-LastestVersion"
+			data-replace="true">正在获取最新版本……</a>
+			<div style="text-align: start;" 
+			data-remote="https://sb.alseece.top/2/value.php?key=DoL-Dynamicest-Notice"
+			data-replace="true">正在获取公告</div>
+			<<run Dynamicest.loadRemote()>>
+		</div>
+		<div class="m-2">
+			<p class="gold m-0">百度贴吧发布帖</p>
+			<a target="_blank" class="link-external" href="https://tieba.baidu.com/p/10532247085?fr=personpage" tabindex="0">动态美化 |动态数值/无需框架/完美兼容/模组也适配</a>
+		</div>
+	</div>
+	<br><br>
+<</widget>>

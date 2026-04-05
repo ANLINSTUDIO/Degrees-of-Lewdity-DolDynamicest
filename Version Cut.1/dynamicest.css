@@ -1,0 +1,17 @@
+/* === 状态美化 =============================== */
+/* 状态缓动 */
+.meter div {
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.8s ease;
+}
+/* 折叠状态框取消底部dot */
+mouse.tooltip-small, mouse.tooltip-centertop {
+    border-bottom: 0;
+}
+/* 配置stat底部状态条 */
+.stat .meter {
+    z-index: 0;
+    height: 2px;
+}
+.stat .meter div {
+    height: 2px;
+}
