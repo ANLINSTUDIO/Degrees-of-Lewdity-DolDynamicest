@@ -1,7 +1,7 @@
 {
     "name": "Dynamicest",
     "nickName": "极致动态",
-    "version": "2.4",
+    "version": "2.5",
     "styleFileList": ["dynamicest.css"],
     "scriptFileList": ["dynamicest.js"],
     "tweeFileList": ["settings.twee"],

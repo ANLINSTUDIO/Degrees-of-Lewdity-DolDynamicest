@@ -1,6 +1,6 @@
 {
     "name": "Dynamicest",
-    "nickName": "极致动态 仅状态条美化",
+    "nickName": "极致动态  ",
     "version": "cut.1",
     "styleFileList": ["dynamicest.css"],
     "scriptFileList": ["dynamicest.js"],

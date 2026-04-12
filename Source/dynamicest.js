@@ -58,13 +58,17 @@ Dynamicest.onPassageRender = function (ev) {
         Dynamicest.LoadMoney();
         Dynamicest.LoadValues();
 
+        const passage = V.passage;
+
         const runTask = (task) => {
-            return new Promise(resolve => {
-                requestAnimationFrame(() => {
-                    task();
-                    resolve();
+            if (passage === V.passage) {
+                return new Promise(resolve => {
+                    requestAnimationFrame(() => {
+                        task();
+                        resolve();
+                    });
                 });
-            });
+            }
         };
         
         runTask(() => {})
