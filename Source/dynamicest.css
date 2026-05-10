@@ -73,6 +73,14 @@
     margin: 0.15rem;
     flex-grow: 1;
 }
+.box-sides {
+    word-break: break-all;
+    max-height: 100px;
+    overflow-y: auto;
+}
+.box-sides * {
+    pointer-events: none;
+}
 
 
 

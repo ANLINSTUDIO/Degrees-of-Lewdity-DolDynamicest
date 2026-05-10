@@ -107,17 +107,23 @@
 		<div class="settingsToggleItemWide text-align-center">
 			<label>
 				<<checkbox "$Dynamicest.Settings.EnableSides" false true autocheck>>
-				<span class="gold">侧边栏动态提醒</span>
+				<span class="gold">侧边栏动态提醒</span> <span>取消勾选此项可以解决与某些模组冲突导致的频繁弹窗问题（更值后重新打开设置）</span>
 			</label>
 		</div>
-		<<for _side range Dynamicest.getFilterOptions("Sides")>>
-			<div class="settingsToggleItem">
-				<label>
-					<<print '<input type="checkbox" onchange="Dynamicest.settingFilter(`Sides`, `'+_side+'`, this.checked)"'+Dynamicest.getFilter("Sides", _side)+'>'>>
-					<<print _side>>
-				</label>
-			</div>
-		<</for>>
+		<<if $Dynamicest.Settings.EnableSides>>
+			<<for _side range Dynamicest.getFilterOptions("Sides")>>
+				<div class="settingsToggleItem">
+					<label>
+						<<set _key to JSON.stringify(_side.replaceAll(" ", "").replaceAll(" ", "").replaceAll("<", "").replaceAll(">", "").replaceAll("\\", "").replaceAll('"', "").replaceAll("'", "").replaceAll("`", "").replaceAll("=", "").replaceAll("(", "").replaceAll(")", "").replaceAll(",", ""))>>
+						<<set _onchange to 'Dynamicest.settingFilter("Sides", ' + _key + ', this.checked)'>>
+						<<print '<input type="checkbox" @onchange=_onchange'+Dynamicest.getFilter("Sides", T.key.substring(1, T.key.length-1))+'>'>>
+						<div class="box-sides">
+							<<print _side>>
+						</div>
+					</label>
+				</div>
+			<</for>>
+		<</if>>
 	</div>
 	<div class="settingsGrid">
 		<div class="settingsHeader options">「日志」键过滤</div>

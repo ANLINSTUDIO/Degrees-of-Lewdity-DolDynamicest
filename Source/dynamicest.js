@@ -350,8 +350,6 @@ Dynamicest.applyTransition = function(oldElement, newElement) {
                 // 恢复为新样式，触发过渡
                 ((newNode, originalStyles) => setTimeout(() => {
                     for (const [prop, value] of Object.entries(originalStyles)) {
-                        console.log(prop, value);
-                        
                         newNode.style.setProperty(prop, value);
                     }
                 }, 400))(newNode, originalStyles);
