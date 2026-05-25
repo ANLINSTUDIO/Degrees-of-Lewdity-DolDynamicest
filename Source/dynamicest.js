@@ -53,7 +53,7 @@ Dynamicest.onPassageRender = function (ev) {
     Dynamicest.DisplayFold = {};
     Dynamicest.DisplayFoldClose = false;
 
-    queueMicrotask(() => {
+    setTimeout(() => {
         Dynamicest.LoadStats();
         Dynamicest.LoadMoney();
         Dynamicest.LoadValues();
@@ -81,7 +81,7 @@ Dynamicest.onPassageRender = function (ev) {
                 Dynamicest.First = false;
                 Dynamicest.LoadFoldedDisplay();
             }));
-    });
+    }, 1);
 };
 
 Dynamicest.loadRemote = function() {

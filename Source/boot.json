@@ -1,7 +1,7 @@
 {
     "name": "Dynamicest",
     "nickName": "极致动态",
-    "version": "2.6",
+    "version": "2.7",
     "styleFileList": ["dynamicest.css"],
     "scriptFileList": ["dynamicest.js"],
     "tweeFileList": ["settings.twee"],
@@ -23,10 +23,12 @@
             ]
         },
         {
-            "modName": "ModLoader DoL ImageLoaderHook",
-            "addonName": "ImageLoaderAddon",
-            "modVersion": "^2.3.0",
-            "params": []
+            "modName": "BeautySelectorAddon",
+            "addonName": "BeautySelectorAddon",
+            "modVersion": "^2.0.0",
+            "params": {
+                "type": "极致动态"
+            }
         }
     ],
     "dependenceInfo": [
@@ -38,10 +40,10 @@
         {
             "modName": "TweeReplacer",
             "version": "^1.0.0"
-        },
+        },  
         {
-            "modName": "ModLoader DoL ImageLoaderHook",
-            "version": "^2.3.0"
+            "modName": "BeautySelectorAddon",
+            "version": "^2.0.0"
         }
     ]
 }
