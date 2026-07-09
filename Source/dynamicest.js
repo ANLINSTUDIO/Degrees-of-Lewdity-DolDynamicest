@@ -719,7 +719,7 @@ Dynamicest.LoadValues = function() {
 
     if (!V.Dynamicest.Settings.FilterOutside && Dynamicest.CheckValue("outside", V.outside))  Values.push(`
         <div>
-            <img class="icon_ui" src="img/ui/${V.outside ? "icon_open" : "icon_closed"}.png" style="${V.outside ? "transform: translateY(25%);" : ""}"> 
+            <img class="icon_ui" src="img/ui/sidebar-${V.outside ? "open" : "closed"}.png" style="${V.outside ? "transform: translateY(25%);" : ""}"> 
             <span>
                 ${V.outside ? "<<possessedWord '你'>>在室外。" : "<<possessedWord '你'>>在室内。"}
             </span>
