@@ -697,9 +697,9 @@ Dynamicest.LoadValues = function() {
             <div style="display: flex;">
                 <<for _i to 1; _i lte $spraymax; _i++>>
                     <<if $spray gte _i>>
-                        <img draggable="false" src="img/ui/pepperspray.png">
+                        <img draggable="false" src="img/ui/pepper-spray.png">
                     <<else>>
-                        <img draggable="false" src="img/ui/emptyspray.png">
+                        <img draggable="false" src="img/ui/empty-spray.png">
                     <</if>>
                 <</for>>
             </div>
