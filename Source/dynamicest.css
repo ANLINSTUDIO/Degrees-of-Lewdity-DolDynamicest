@@ -83,7 +83,6 @@
 }
 
 
-
 /* === 状态美化 =============================== */
 /* 状态缓动 */
 .meter div {
@@ -100,4 +99,18 @@ mouse.tooltip-small, mouse.tooltip-centertop {
 }
 .stat .meter div {
     height: 2px;
+}
+
+
+/* === 选项标签 =============================== */
+.dynamicest-settings-title > span {
+    position: relative;
+    z-index: 1;
+}
+.dynamicest-settings-title > img {
+    position: absolute;
+    left: -1%;
+    width: 25%;
+    top: -5%;
+    opacity: 0.5;
 }

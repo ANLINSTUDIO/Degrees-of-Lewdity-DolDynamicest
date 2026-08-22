@@ -84,29 +84,6 @@ Dynamicest.onPassageRender = function (ev) {
     }, 1);
 };
 
-Dynamicest.loadRemote = function() {
-    queueMicrotask(() => { 
-        document.querySelectorAll('[data-remote]').forEach(async element => {
-            try {
-            const response = await fetch(element.dataset.remote, {
-                mode: 'cors',
-                credentials: 'omit'
-            });
-            const data = await response.json();
-            if (!data.error) {
-                let content = data.value;
-                if (element.dataset.replace === 'true') {
-                content = content.replaceAll('\n', '<br>');
-                }
-                element.innerHTML = content;
-            }
-            } catch (error) {
-            element.innerHTML = element.dataset.error || '加载失败';
-            }
-        });
-    });
-};
-
 // === 金钱动态 =================================
 Dynamicest.animateMoneyChange = function(lastMoney, newMoney, relMoneyAbs, isPositive) {
     const relElement = document.getElementById('relmoney');
@@ -709,11 +686,13 @@ Dynamicest.LoadValues = function() {
         Values.push(`<div id="characterTemperatureDynamicest"><canvas width="32" height="24"></canvas></div>${setup.WeatherDescriptions.bodyTemperature()}<br>${setup.WeatherDescriptions.bodyTemperatureChanges()}`);
         funcs.push(() => {
             const characterTemperature = document.querySelector("#characterTemperature>canvas");
-            document.querySelector("#characterTemperatureDynamicest>canvas").getContext('2d').drawImage(
-                characterTemperature,
-                0, 0,
-                characterTemperature.width, characterTemperature.height,
-            );
+            if (characterTemperature) {
+                document.querySelector("#characterTemperatureDynamicest>canvas").getContext('2d').drawImage(
+                    characterTemperature,
+                    0, 0,
+                    characterTemperature.width, characterTemperature.height,
+                );
+            }
         })
     }
 
