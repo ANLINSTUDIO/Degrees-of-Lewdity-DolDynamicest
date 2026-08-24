@@ -87,7 +87,7 @@ def main():
     print("="*50)
     # 3. 获取版本号用于 ZIP 文件名
     version = config.get('version', 'unknown')
-    zip_name = f"极致动态Dynamicest-{version}-DolMod.zip"
+    zip_name = f"Dynamicest-{version}-DolMod.zip"
     print("version: ", version)
     print("filenam: ", zip_name)
     print("开始打包")

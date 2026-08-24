@@ -109,8 +109,8 @@ mouse.tooltip-small, mouse.tooltip-centertop {
 }
 .dynamicest-settings-title > img {
     position: absolute;
-    left: -1%;
-    width: 25%;
-    top: -5%;
+    left: -2%;
+    height: 120%;
+    top: -10%;
     opacity: 0.5;
 }

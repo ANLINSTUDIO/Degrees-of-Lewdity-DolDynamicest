@@ -81,7 +81,7 @@ Dynamicest.onPassageRender = function (ev) {
                 Dynamicest.First = false;
                 Dynamicest.LoadFoldedDisplay();
             }));
-    }, 1);
+    });
 };
 
 // === 金钱动态 =================================
@@ -213,6 +213,9 @@ Dynamicest.LoadStats = function() {
 
             // 创建移动stat条（如果有）
             if (mobile_stat) {
+                while (mobile_stat.children.length > 1) {
+                    mobile_stat.removeChild(mobile_stat.lastElementChild);
+                }
                 const div_meter = document.createElement("div")
                 div_meter.className = "meter"
                 const div = document.createElement("div")
