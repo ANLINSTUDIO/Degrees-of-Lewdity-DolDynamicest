@@ -88,6 +88,36 @@
 .meter div {
     transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.8s ease;
 }
+@keyframes dynamicest-highlight-pinkbar {
+  0%   { background-color: transparent; }
+  5%   { background-color: var(--pink); }
+  100% { background-color: transparent; }
+}
+@keyframes dynamicest-highlight-purplebar {
+  0%   { background-color: transparent; }
+  5%   { background-color: var(--purple-secondary); }
+  100% { background-color: transparent; }
+}
+@keyframes dynamicest-highlight-bluebar {
+  0%   { background-color: transparent; }
+  5%   { background-color: var(--blue); }
+  100% { background-color: transparent; }
+}
+@keyframes dynamicest-highlight-lbluebar {
+  0%   { background-color: transparent; }
+  5%   { background-color: var(--blue-secondary); }
+  100% { background-color: transparent; }
+}
+@keyframes dynamicest-highlight-tealbar {
+  0%   { background-color: transparent; }
+  5%   { background-color: var(--teal); }
+  100% { background-color: transparent; }
+}
+@keyframes dynamicest-highlight-redbar {
+  0%   { background-color: transparent; }
+  5%   { background-color: var(--red); }
+  100% { background-color: transparent; }
+}
 /* 折叠状态框取消底部dot */
 mouse.tooltip-small, mouse.tooltip-centertop {
     border-bottom: 0;

@@ -54,6 +54,13 @@
 			</label>
 			<span class="tooltip-anchor linkBlue" tooltip="勾选此项后可以穿过提醒弹窗点击文本内容（除了折叠的）">(?)</span>
 		</div>
+		<div class="settingsToggleItem">
+			<label>
+				<<checkbox "$Dynamicest.Settings.DynamicestShowNPCAppearance" false true autocheck>>
+				人物出场提醒
+			</label>
+			<span class="tooltip-anchor linkBlue" tooltip="勾选此项后已命名NPC出场时会自动弹窗提醒其属性">(?)</span>
+		</div>
 	</div>
 	<div class="p-2 text-align-center">
 		<h3><span class="teal">键过滤</span>勾选后将不再显示相应的动态</h3>
@@ -159,4 +166,112 @@
 		<</for>>
 	</div>
 	<br><br>
+<</widget>>
+
+<<widget "painstatbar">>
+	<div id="paincaptionstat">
+		<div class="meter">
+			<<set _statkey to 'paincaption'>>
+			<<set _percent to Math.floor(($pain/100)*100)>>
+			<<set _minPercent to Math.clamp(Math.floor((statChange.minPain() / 100)*100), 0, _percent)>>
+			<<if $pain gte 100 and $willpowerpain is 0>>
+				<<set _statColor to "redbar">>
+			<<elseif $pain gte 80>>
+				<<set _statColor to "pinkbar">>
+			<<elseif $pain gte 60>>
+				<<set _statColor to "purplebar">>
+			<<elseif $pain gte 40>>
+				<<set _statColor to "bluebar">>
+			<<elseif $pain gte 20>>
+				<<set _statColor to "lbluebar">>
+			<<elseif $pain gte 1>>
+				<<set _statColor to "tealbar">>
+			<<else>>
+				<<set _statColor to "greenbar">>
+			<</if>>
+			<<run window.Dynamicest?.statChange()>>
+			<div @class="_statColor" @style="'width:' + _percent + '%'"></div>
+			<<if $pain gt 100>>
+				<div @class="$willpowerpain === 0 ? 'dangerbar' : 'redbar'" @style="'width:' + ($pain - 100) + '%'"></div>
+			<<elseif _minPercent>>
+				<div @class="_statColor + ' meterMin'" @style="'width:' + _minPercent + '%'"></div>
+			<</if>>
+		</div>
+	</div>
+<</widget>>
+
+<<widget "allurestatbar">>
+	<<if Number.isFinite($allure)>>
+		<div id="allurecaptionstat">
+			<div class="meter">
+				<<set _statkey to 'allurecaption'>>
+				<<set _percent=Math.floor(($allure/(8000 * $settings.allureModifier))*100)>>
+				<<run window.Dynamicest?.allureChange()>>
+				<<if $allure gte (6000 * $settings.allureModifier)>>
+				<<print '<div class="redbar" style="width:' + _percent + '%"></div>'>>
+				<<elseif $allure gte (4000 * $settings.allureModifier)>>
+				<<print '<div class="pinkbar" style="width:' + _percent + '%"></div>'>>
+				<<elseif $allure gte (3000 * $settings.allureModifier)>>
+				<<print '<div class="purplebar" style="width:' + _percent + '%"></div>'>>
+				<<elseif $allure gte (2000 * $settings.allureModifier)>>
+				<<print '<div class="bluebar" style="width:' + _percent + '%"></div>'>>
+				<<elseif $allure gte (1500 * $settings.allureModifier)>>
+				<<print '<div class="lbluebar" style="width:' + _percent + '%"></div>'>>
+				<<elseif $allure gte (1000 * $settings.allureModifier)>>
+				<<print '<div class="tealbar" style="width:' + _percent + '%"></div>'>>
+				<<else>>
+				<<print '<div class="greenbar" style="width:' + _percent + '%"></div>'>>
+				<</if>>
+				<<run window.Dynamicest?.allureChangeFinish()>>
+			</div>
+		</div>
+	<</if>>
+<</widget>>
+
+<<widget "drunkstatbar">>
+	<<if $drunk gt 0>>
+		<div id="paincaptionstat">
+			<<set $_colour to getColourClassFromPercentage($drunk * (100 / 480), "drunk")>>
+			<<set $_barColour to $_colour + "bar">>
+			<<set $_percent to Math.floor(($drunk/1000)*100)>>
+			<<set $_barWidth to `width:${$_percent}%`>>
+			<<set _statkey to 'drunkcaption'>>
+
+			<div class="meter">
+				<div @class="$_barColour" @style="$_barWidth"></div>
+			</div>
+		</div>
+	<</if>>
+<</widget>>
+
+<<widget "druggedstatbar">>
+	<<if $drugged gt 0>>
+		<div id="druggedcaptionstat">
+			<<set $_colour to getColourClassFromPercentage($drugged / 5, "drugged")>>
+			<<set $_barColour to $_colour + "bar">>
+			<<set $_percent to Math.floor(($drugged/1000)*100)>>
+			<<set $_barWidth to `width:${$_percent}%`>>
+			<<set _statkey to 'druggedcaption'>>
+
+			<div class="meter">
+				<div @class="$_barColour" @style="$_barWidth"></div>
+			</div>
+		</div>
+	<</if>>
+<</widget>>
+
+<<widget "hallucinogenstatbar">>
+	<<if $hallucinogen gt 0>>
+		<div id="hallucinogencaptionstat">
+			<<set $_colour to getColourClassFromPercentage($hallucinogen / 5, "hallucinogen")>>
+			<<set $_barColour to $_colour + "bar">>
+			<<set $_percent to Math.floor(($hallucinogen/1000)*100)>>
+			<<set $_barWidth to `width:${$_percent}%`>>
+			<<set _statkey to 'hallucinogencaption'>>
+
+			<div class="meter">
+				<div @class="$_barColour" @style="$_barWidth"></div>
+			</div>
+		</div>
+	<</if>>
 <</widget>>

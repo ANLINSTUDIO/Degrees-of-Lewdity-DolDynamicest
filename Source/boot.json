@@ -1,7 +1,7 @@
 {
     "name": "Dynamicest",
     "nickName": "极致动态 - 动态弹窗提醒，不错过任何一个细微的变化",
-    "version": "3.0",
+    "version": "3.1",
     "styleFileList": [
         "dynamicest.css"
     ],
@@ -25,6 +25,170 @@
                     "findRegex": "<<optionsinformation>><<\\/replace>>[\\s\\S]*?<<\\/button>>",
                     "regexFlag": "g",
                     "replace": "<<optionsinformation>><</replace>>\n\t\t<</button>><<dynamicestModTab>>"
+                },
+                {
+                    "tip": "替换 statbar、statbarinverted 和 paincaption",
+                    "passage": "Widgets",
+                    "findString": "<div @class=\"_statColor\" @style=\"'width:' + _percent + '%'\"></div>",
+                    "replace": "<<run window.Dynamicest?.statChange()>> <div @class=\"_statColor\" @style=\"'width:' + _percent + '%'\"></div>",
+                    "all": true
+                },
+                {
+                    "tip": "statbar 防止为0值时无动画",
+                    "passage": "Widgets",
+                    "findString": "<<if _args[1] is 0>>",
+                    "replace": "<<if _args[1] is 0 and false>>"
+                },
+                {
+                    "tip": "statbarinverted 防止为0值时无动画",
+                    "passage": "Widgets",
+                    "findString": "'meter')\">\n\t\t<<if _args[0] is 0>>",
+                    "replace": "'meter')\">\n\t\t<<if _args[0] is 0 and false>>"
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<<statbar 0 $tiredness",
+                    "replace": "<<set _statkey to 'tirednesscaption'>><<statbar 0 $tiredness"
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<<statbar 0 $stress",
+                    "replace": "<<set _statkey to 'stresscaption'>><<statbar 0 $stress"
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<<statbar 0 $trauma",
+                    "replace": "<<set _statkey to 'traumacaption'>><<statbar 0 $trauma"
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<<statbar `statChange.minArousal()`",
+                    "replace": "<<set _statkey to 'arousalcaption'>><<statbar `statChange.minArousal()`"
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<<statbar 0 $lewdity",
+                    "replace": "<<set _statkey to 'lewditycaption'>><<statbar 0 $lewdity"
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<<statbarinverted $awareness",
+                    "replace": "<<set _statkey to 'innocencecaption'>><<statbarinverted $awareness"
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<<statbarinverted $control",
+                    "replace": "<<set _statkey to 'controlcaption'>><<statbarinverted $control"
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<<statbarinverted $oxygen",
+                    "replace": "<<set _statkey to 'oxygencaption'>><<statbarinverted $oxygen"
+                },
+                {
+                    "tip": "paincaption 单独设置",
+                    "passage": "Widgets",
+                    "findString": "<<set _percent to Math.floor(($pain/100)*100)>>",
+                    "replace": "<<set _statkey to 'paincaption'>><<set _percent to Math.floor(($pain/100)*100)>>"
+                },
+                {
+                    "tip": "替换 allurecaption",
+                    "passage": "Widgets",
+                    "findString": "<<set _percent=Math.floor(($allure/(8000 * $settings.allureModifier))*100)>>",
+                    "replace": "<<set _percent=Math.floor(($allure/(8000 * $settings.allureModifier))*100)>><<run window.Dynamicest?.allureChange()>>"
+                },
+                {
+                    "tip": "替换 allurecaption 结束，恢复 V.allure",
+                    "passage": "Widgets",
+                    "findString": "<<if $allure gte 8000",
+                    "replace": "<<run window.Dynamicest?.allureChangeFinish()>><<if $allure gte 8000"
+                },
+                {
+                    "tip": "替换 drunkcaption、druggedcaption 和 hallucinogencaption",
+                    "passage": "Widgets",
+                    "findString": "<div @class=\"$_barColour\" @style=\"$_barWidth\"></div>",
+                    "replace": "<<run window.Dynamicest?.statChange()>> <div @class=\"$_barColour\" @style=\"$_barWidth\"></div>"
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<div id=\"drunkcaption\"",
+                    "replace": "<<set _statkey to 'drunkcaption'>> <div id=\"drunkcaption\""
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<div id=\"druggedcaption\"",
+                    "replace": "<<set _statkey to 'druggedcaption'>> <div id=\"druggedcaption\""
+                },
+                {
+                    "passage": "Widgets",
+                    "findString": "<div id=\"hallucinogencaption\"",
+                    "replace": "<<set _statkey to 'hallucinogencaption'>> <div id=\"hallucinogencaption\""
+                },
+                {
+                    "tip": "移动stats - 疼痛",
+                    "passage": "mobileStats",
+                    "findString": "<<print $pain.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $pain.toFixed(2)>></span></mouse> <<painstatbar>>"
+                },
+                {
+                    "tip": "移动stats - 性欲",
+                    "passage": "mobileStats",
+                    "findString": "<<print $arousal.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $arousal.toFixed(2)>></span></mouse> <<set _statkey to 'arousalcaption'>><div id=\"arousalcaptionstat\"><<statbar `statChange.minArousal()` $arousal $arousalmax>></div>"
+                },
+                {
+                    "tip": "移动stats - 疲劳",
+                    "passage": "mobileStats",
+                    "findString": "<<print $tiredness.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $tiredness.toFixed(2)>></span></mouse> <<set _statkey to 'tirednesscaption'>><div id=\"tirednesscaptionstat\"><<statbar 0 $tiredness `C.tiredness.max`>></div>"
+                },
+                {
+                    "tip": "移动stats - 压力",
+                    "passage": "mobileStats",
+                    "findString": "<<print $stress.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $stress.toFixed(2)>></span></mouse> <<set _statkey to 'stresscaption'>><div id=\"stresscaptionstat\"><<statbar 0 $stress $stressmax>></div>"
+                },
+                {
+                    "tip": "移动stats - 纯真",
+                    "passage": "mobileStats",
+                    "findString": "<<print Math.abs($awareness).toFixed(2)>></span></mouse>",
+                    "replace": "<<print Math.abs($awareness).toFixed(2)>></span></mouse> <<set _statkey to 'innocencecaption'>><div id=\"innocencecaptionstat\"><<statbarinverted $awareness -200>></div>"
+                },
+                {
+                    "tip": "移动stats - 创伤",
+                    "passage": "mobileStats",
+                    "findString": "<<print $trauma.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $trauma.toFixed(2)>></span></mouse> <<set _statkey to 'traumacaption'>><div id=\"traumacaptionstat\"><<statbar 0 $trauma $traumamax>></div>"
+                },
+                {
+                    "tip": "移动stats - 自控",
+                    "passage": "mobileStats",
+                    "findString": "<<print $control.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $control.toFixed(2)>></span></mouse> <<set _statkey to 'controlcaption'>><div id=\"controlcaptionstat\"><<statbarinverted $control $controlmax>></div>"
+                },
+                {
+                    "tip": "移动stats - 诱惑",
+                    "passage": "mobileStats",
+                    "findString": "<<print $allure.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $allure.toFixed(2)>></span></mouse> <<allurestatbar>>"
+                },
+                {
+                    "tip": "移动stats - 醉酒",
+                    "passage": "mobileStats",
+                    "findString": "<<print $drunk.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $drunk.toFixed(2)>></span></mouse> <<drunkstatbar>>"
+                },
+                {
+                    "tip": "移动stats - 药物",
+                    "passage": "mobileStats",
+                    "findString": "<<print $drugged.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $drugged.toFixed(2)>></span></mouse> <<druggedstatbar>>"
+                },
+                {
+                    "tip": "移动stats - 致幻",
+                    "passage": "mobileStats",
+                    "findString": "<<print $hallucinogen.toFixed(2)>></span></mouse>",
+                    "replace": "<<print $hallucinogen.toFixed(2)>></span></mouse> <<hallucinogenstatbar>>"
                 }
             ]
         },

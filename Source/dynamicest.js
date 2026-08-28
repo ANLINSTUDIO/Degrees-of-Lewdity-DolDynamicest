@@ -21,6 +21,21 @@ Dynamicest.HistorySides = new Set();
 
 // === 注入 =====================================
 $(document).on(":passagerender", function (ev) {Dynamicest.onPassageRender(ev)});
+// 【工具】注入游戏宏，在调用原宏后再执行指定的功能。
+Dynamicest.onMacro = function(macroName, afterFn) {
+    let originalMacro = Macro.get(macroName);
+    if (originalMacro) {
+        let oldHandler = originalMacro.handler;
+        Macro.delete(macroName);
+        Macro.add(macroName, {
+            handler: function () {
+                oldHandler.apply(this, arguments);
+                afterFn.apply(this, arguments);
+            }
+        });
+    }
+};
+
 Dynamicest.onPassageRender = function (ev) {
 
     // === 数值存储存档 ==============================
@@ -41,6 +56,7 @@ Dynamicest.onPassageRender = function (ev) {
     V.Dynamicest.Settings.FilterSpray = V.Dynamicest.Settings.FilterSpray ?? false;
 
     V.Dynamicest.Settings.DynamicestDisplayPenetrate = V.Dynamicest.Settings.DynamicestDisplayPenetrate ?? true;
+    V.Dynamicest.Settings.DynamicestShowNPCAppearance = V.Dynamicest.Settings.DynamicestShowNPCAppearance ?? true;
     V.Dynamicest.Settings.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop ?? 10;
     V.Dynamicest.Settings.DynamicestDisplayScale = V.Dynamicest.Settings.DynamicestDisplayScale ?? 1.0;
     V.Dynamicest.Settings.DynamicestDisplayOpacity = V.Dynamicest.Settings.DynamicestDisplayOpacity ?? 1.0;
@@ -83,6 +99,125 @@ Dynamicest.onPassageRender = function (ev) {
             }));
     });
 };
+
+Dynamicest.npc_appearance = function() {
+    if (V.Dynamicest.Settings.DynamicestDisplayPenetrate) {
+        let name = T.nam;
+        if (setup.NPCNameList_cn_name) {
+            name = setup.NPCNameList_cn_name.split(`${T.nam},`)[1]?.split("|")[0]
+        }
+        if (name) {
+            const relation_title = Object.keys(Dynamicest.LastRelations).find((key) => key.includes(name));
+            if (relation_title) {
+                T.DynamicestSocialsForceShow = [...T.DynamicestSocialsForceShow??[], relation_title]
+            }
+        }
+    }
+}
+
+$(document).one(":passageinit", function () {
+    Dynamicest.onMacro("npc", Dynamicest.npc_appearance);
+});
+
+// 
+
+Dynamicest.statChange = function() {
+    const key = T.statkey;
+    if (key !== undefined) {
+        T.statkey = undefined;
+        const values = [T.percent, T.minPercent, T.pin, T.statColor];
+        if (Dynamicest.LastState.has(key)) {
+            [T.percent, T.minPercent, T.pin, T.statColor] = Dynamicest.LastState.get(key);
+        } else {
+            [T.percent, T.minPercent, T.pin, T.statColor] = [0, 0, 0, "transparent"]
+        }
+        
+        T.statChanged = T.statChanged || {}
+        T.statChanged[key] = values;
+    }
+}
+
+Dynamicest.allureChange = function() {
+    const key = "allurecaption";
+    let statColor = "greenbar";
+    if (V.allure >= (6000 * V.settings.allureModifier)) {
+        statColor = "redbar"
+    } else if (V.allure >= (4000 * V.settings.allureModifier)) {
+        statColor = "pinkbar"
+    } else if (V.allure >= (3000 * V.settings.allureModifier)) {
+        statColor = "purplebar"
+    } else if (V.allure >= (2000 * V.settings.allureModifier)) {
+        statColor = "bluebar"
+    } else if (V.allure >= (1500 * V.settings.allureModifier)) {
+        statColor = "lbluebar"
+    } else if (V.allure >= (1000 * V.settings.allureModifier)) {
+        statColor = "tealbar"
+    }
+    const values = [T.percent, V.allure, null, statColor];
+    if (Dynamicest.LastState.has(key)) {
+        const LastState = Dynamicest.LastState.get(key)
+        T.percent = LastState[0];
+        V.allure = LastState[1];
+    }
+    T.statChanged = T.statChanged || {}
+    T.statChanged[key] = values;
+}
+
+Dynamicest.allureChangeFinish = function() {
+    const key = "allurecaption";
+    if (T.statChanged && T.statChanged.hasOwnProperty(key)) {
+        V.allure = T.statChanged[key][1];
+    }
+}
+
+Dynamicest.LoadStats = function() {
+    if (T.statChanged) {
+        Object.keys(T.statChanged).forEach(key => {
+            Dynamicest.LastState.set(key, T.statChanged[key]);
+        })
+        delete T.statChanged;
+    }
+
+    let i = 0;
+    const stowed = document.getElementById("ui-bar").classList.contains("stowed");
+    Dynamicest.LastState.keys().forEach(key => {
+        const values = Dynamicest.LastState.get(key);
+        let anchor_primary, anchor_secondary;
+        if (stowed) {
+            anchor_primary = document.getElementById(key+"stat");
+            anchor_secondary = document.getElementById(key);
+        } else {
+            anchor_primary = document.getElementById(key);
+            anchor_secondary = document.getElementById(key+"stat");
+        }
+
+        const meter_primary = anchor_primary?.querySelector(".meter");
+        if (meter_primary) {
+            const statbar = meter_primary.children[0];
+            if (statbar) {
+                if (statbar.style.width !== values[0] + "%") {
+                    setTimeout(() => {
+                        let container;
+                        if (stowed) { container = $(`#${key+"stat"}`).parent(); } else { container = $(`#${key}`); }
+                        container.css("animation", `dynamicest-highlight-${values[3]} 1s ease 1`);
+                        statbar.style.width = values[0] + "%";
+                        statbar.className = values[3];
+                    }, 100 * i);
+                    i++;
+                }
+            }
+        }
+
+        const meter_secondary = anchor_secondary?.querySelector(".meter");
+        if (meter_secondary) {
+            const statbar = meter_secondary.children[0];
+            if (statbar) {
+                statbar.style.width = values[0] + "%";
+                statbar.className = values[3];
+            }
+        }
+    })
+}
 
 // === 金钱动态 =================================
 Dynamicest.animateMoneyChange = function(lastMoney, newMoney, relMoneyAbs, isPositive) {
@@ -160,94 +295,6 @@ Dynamicest.LoadMoney = function() {
         Dynamicest.FinishList("money", 2000);
     }
     Dynamicest.LastMoney = V.money;
-};
-
-// === 状态动态 =================================
-Dynamicest.LoadStats = function() {
-    const stowed = document.getElementById("ui-bar").classList.contains("stowed")
-    const stats = document.querySelectorAll('#statmeters > div');
-    const mobileStats = document.querySelectorAll('#mobileStats .stat');
-
-    stats.forEach(stat => {
-        const stat_id = stat.id
-        let stat_title = stat.title
-
-        stat_title = stat_title.replace("醉意", "醉酒")  // 单独适配醉意
-        stat_title = stat_title.replace("药物", "麻醉")  // 单独适配药物
-
-        try {
-            let meter = stat.querySelector(".meter")
-            if (!meter) {
-                console.log(`[状态美化错误] ${stat_id} 找不到meter: ${stat.getHTML()}`);
-                return
-            }
-            let bar = meter.querySelector("div")
-            const newclassname = bar? bar.className: '';
-            const newWidth = bar? bar.style.width: '0%';
-            let lastclassname = '';
-            let lastWidth = '0%';
-            if (Dynamicest.LastState.has(stat_id)) {
-                lastclassname = Dynamicest.LastState.get(stat_id)[0];
-                lastWidth = Dynamicest.LastState.get(stat_id)[1];
-            }
-
-            // 没有bar了：可能是为值零，不显示了
-            if (!bar) {
-                const div = document.createElement("div")
-                div.style.width = '0%'
-                meter.append(div)
-                bar = div
-            }
-
-            // 寻找移动stat
-            const mobile_stat = mobileStats.find(i => {
-                const mobile_stat = mobileStats[i]
-                const span = mobile_stat.querySelector("mouse > span")
-                if (span) {
-                    return span.innerText === stat_title
-                } else {
-                    return false
-                }
-            })
-            let mobile_stat_bar = null
-
-            // 创建移动stat条（如果有）
-            if (mobile_stat) {
-                while (mobile_stat.children.length > 1) {
-                    mobile_stat.removeChild(mobile_stat.lastElementChild);
-                }
-                const div_meter = document.createElement("div")
-                div_meter.className = "meter"
-                const div = document.createElement("div")
-                div.className = newclassname
-                div.style.width = bar.style.width
-                div_meter.append(div)
-                mobile_stat.append(div_meter)
-                mobile_stat_bar = div
-
-                if (stowed) {
-                    bar = mobile_stat_bar
-                }
-            }
-            
-            //  动态更改
-            if (lastWidth !== newWidth) {
-                bar.style.transition = 'none';
-                bar.className = lastclassname
-                bar.style.width = lastWidth;
-
-                bar.offsetHeight;
-                
-                bar.style.transition = '';
-                bar.className = newclassname
-                bar.style.width = newWidth;
-            }
-
-            Dynamicest.LastState.set(stat_id, [newclassname, newWidth]);
-        } catch (err)  {
-            console.log(`[状态美化错误] ${stat_id} ${err}:  ${stat.getHTML()}`);
-        }
-    })
 };
 
 // === 隐藏属性动态 =============================
@@ -392,7 +439,7 @@ Dynamicest.LoadSocials = function() {
         if (relation_title && !V.Dynamicest.Settings.FilterRelations.includes(relation_title)) {  // 有Title，才有键，才可以动态查询修改
             const LastRelation = Dynamicest.LastRelations[relation_title];
             if (LastRelation) {
-                if (LastRelation.innerText !== relation_box.innerText) {  // 有改动，动态展示，否则不变
+                if (LastRelation.innerText !== relation_box.innerText || T.DynamicestSocialsForceShow?.includes(relation_title)) {  // 有改动，动态展示，否则不变
                     if (!display.hasOwnProperty(relation_class_id)) display[relation_class_id] = [];
                     display[relation_class_id].push([LastRelation, relation_box]);  // 格式：原来的, 现在的
                     display_num += 1;
@@ -560,38 +607,40 @@ Dynamicest.LoadJournals = function() {
 
     // 单独适配智能手机
     if (!V.Dynamicest.Settings.FilterJournals.includes("获得手机")) {
-        const phones = V.Phone?.Owned ? V.Phone.Owned.map(item => item.id): null;
-        if (phones) {
-            phones.forEach(phoneid => {
-                if (Dynamicest.LastJournals["Phone.Owned"] && !Dynamicest.LastJournals["Phone.Owned"].contains(phoneid)) {
-                    const phone = V.Phone.Owned.find(item => item.id === phoneid);
-                    const info = PhoneMod?.getPhoneConditionInfo(phone);
-                    Journals.push(`
-                        <<if ${phone.newnessmax > 0}>>
-                            [ ${PhoneMod?.getPhoneBattery(phone)}% ] 
-                        <<else>>
-                            [ --- ] 
-                        <</if>>
-                        一部${info.html}的 ${phone.model} ，官网售价为
-                        <span class='gold'>£${Math.round(PhoneMod?.getPhoneInfo(phone.model).price)}</span>。
-                        <<if ${phone.stolen}>>
-                            <span class='red'>盗窃得来</span>
-                            <<if ${phone.usable}>>
-                                <span class='yellow'>密码已重置</span>
+        if (window.PhoneMod) {
+            const phones = V.Phone?.Owned ? V.Phone.Owned.map(item => item.id): null;
+            if (phones) {
+                phones.forEach(phoneid => {
+                    if (Dynamicest.LastJournals["Phone.Owned"] && !Dynamicest.LastJournals["Phone.Owned"].contains(phoneid)) {
+                        const phone = V.Phone.Owned.find(item => item.id === phoneid);
+                        const info = window.PhoneMod?.getPhoneConditionInfo(phone);
+                        Journals.push(`
+                            <<if ${phone.newnessmax > 0}>>
+                                [ ${window.PhoneMod?.getPhoneBattery(phone)}% ] 
                             <<else>>
-                                <span class='red'>密码未知</span>
+                                [ --- ] 
                             <</if>>
-                        <<else>>
-                            <<if ${phone.second}>>
-                                <span class='yellow'>地下手机店购买</span>
+                            一部${info.html}的 ${phone.model} ，官网售价为
+                            <span class='gold'>£${Math.round(window.PhoneMod?.getPhoneInfo(phone.model).price)}</span>。
+                            <<if ${phone.stolen}>>
+                                <span class='red'>盗窃得来</span>
+                                <<if ${phone.usable}>>
+                                    <span class='yellow'>密码已重置</span>
+                                <<else>>
+                                    <span class='red'>密码未知</span>
+                                <</if>>
                             <<else>>
-                                <span class='green'>官方渠道购买</span>
-                            <</if>>
-                        <</if>>`);
-                }
-            });
-            Dynamicest.LastJournalsID["获得手机"] = undefined;
-            Dynamicest.LastJournals["Phone.Owned"] = phones;
+                                <<if ${phone.second}>>
+                                    <span class='yellow'>地下手机店购买</span>
+                                <<else>>
+                                    <span class='green'>官方渠道购买</span>
+                                <</if>>
+                            <</if>>`);
+                    }
+                });
+                Dynamicest.LastJournalsID["获得手机"] = undefined;
+                Dynamicest.LastJournals["Phone.Owned"] = phones;
+            }
         }
     };
 
