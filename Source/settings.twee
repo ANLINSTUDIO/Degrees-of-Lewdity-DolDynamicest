@@ -237,13 +237,14 @@
 
 <<widget "drunkstatbar">>
 	<<if $drunk gt 0>>
-		<div id="paincaptionstat">
+		<div id="drunkcaptionstat">
 			<<set $_colour to getColourClassFromPercentage($drunk * (100 / 480), "drunk")>>
 			<<set $_barColour to $_colour + "bar">>
 			<<set $_percent to Math.floor(($drunk/1000)*100)>>
 			<<set $_barWidth to `width:${$_percent}%`>>
 			<<set _statkey to 'drunkcaption'>>
 
+			<<set [$_barColour, $_barWidth] to window.Dynamicest?.statChangeDrunk($_barColour, $_percent)>>
 			<div class="meter">
 				<div @class="$_barColour" @style="$_barWidth"></div>
 			</div>
@@ -260,6 +261,7 @@
 			<<set $_barWidth to `width:${$_percent}%`>>
 			<<set _statkey to 'druggedcaption'>>
 
+			<<set [$_barColour, $_barWidth] to window.Dynamicest?.statChangeDrunk($_barColour, $_percent)>>
 			<div class="meter">
 				<div @class="$_barColour" @style="$_barWidth"></div>
 			</div>
@@ -276,6 +278,7 @@
 			<<set $_barWidth to `width:${$_percent}%`>>
 			<<set _statkey to 'hallucinogencaption'>>
 
+			<<set [$_barColour, $_barWidth] to window.Dynamicest?.statChangeDrunk($_barColour, $_percent)>>
 			<div class="meter">
 				<div @class="$_barColour" @style="$_barWidth"></div>
 			</div>

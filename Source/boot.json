@@ -107,7 +107,7 @@
                     "tip": "替换 drunkcaption、druggedcaption 和 hallucinogencaption",
                     "passage": "Widgets",
                     "findString": "<div @class=\"$_barColour\" @style=\"$_barWidth\"></div>",
-                    "replace": "<<run window.Dynamicest?.statChange()>> <div @class=\"$_barColour\" @style=\"$_barWidth\"></div>"
+                    "replace": "<<set [$_barColour, $_barWidth] to window.Dynamicest?.statChangeDrunk($_barColour, $_percent)>> <div @class=\"$_barColour\" @style=\"$_barWidth\"></div>"
                 },
                 {
                     "passage": "Widgets",

@@ -124,18 +124,40 @@ $(document).one(":passageinit", function () {
 
 Dynamicest.statChange = function() {
     const key = T.statkey;
-    if (key !== undefined) {
+    if (key !== undefined) {//_barColour
         T.statkey = undefined;
         const values = [T.percent, T.minPercent, T.pin, T.statColor];
         if (Dynamicest.LastState.has(key)) {
             [T.percent, T.minPercent, T.pin, T.statColor] = Dynamicest.LastState.get(key);
         } else {
-            [T.percent, T.minPercent, T.pin, T.statColor] = [0, 0, 0, "transparent"]
+            [T.percent, T.minPercent, T.pin, T.statColor] = [0, 0, 0, "whitebar"]
         }
         
         T.statChanged = T.statChanged || {}
         T.statChanged[key] = values;
     }
+}
+
+Dynamicest.statChangeDrunk = function(_barColour, _percent) {
+    const key = T.statkey;
+    if (key !== undefined) {
+        T.statkey = undefined;
+        const values = [_percent, null, null, _barColour];
+        let barWidth, barColour;
+        if (Dynamicest.LastState.has(key)) {
+            barWidth = `width:${Dynamicest.LastState.get(key)[0]}%`;
+            barColour = Dynamicest.LastState.get(key)[3];
+        } else {
+            barWidth = "width: 0%";
+            barColour = "whitebar"
+        }
+        
+        T.statChanged = T.statChanged || {}
+        T.statChanged[key] = values;
+
+        return [barColour, barWidth]
+    }
+    return [_barColour, `width:${_percent}%`]
 }
 
 Dynamicest.allureChange = function() {
