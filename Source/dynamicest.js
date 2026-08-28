@@ -57,6 +57,7 @@ Dynamicest.onPassageRender = function (ev) {
 
     V.Dynamicest.Settings.DynamicestDisplayPenetrate = V.Dynamicest.Settings.DynamicestDisplayPenetrate ?? true;
     V.Dynamicest.Settings.DynamicestShowNPCAppearance = V.Dynamicest.Settings.DynamicestShowNPCAppearance ?? true;
+    V.Dynamicest.Settings.DynamicestFlash = V.Dynamicest.Settings.DynamicestFlash ?? true;
     V.Dynamicest.Settings.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop ?? 10;
     V.Dynamicest.Settings.DynamicestDisplayScale = V.Dynamicest.Settings.DynamicestDisplayScale ?? 1.0;
     V.Dynamicest.Settings.DynamicestDisplayOpacity = V.Dynamicest.Settings.DynamicestDisplayOpacity ?? 1.0;
@@ -197,9 +198,11 @@ Dynamicest.LoadStats = function() {
             if (statbar) {
                 if (statbar.style.width !== values[0] + "%") {
                     setTimeout(() => {
-                        let container;
-                        if (stowed) { container = $(`#${key+"stat"}`).parent(); } else { container = $(`#${key}`); }
-                        container.css("animation", `dynamicest-highlight-${values[3]} 1s ease 1`);
+                        if (V.Dynamicest.Settings.DynamicestFlash) {
+                            let container;
+                            if (stowed) { container = $(`#${key+"stat"}`).parent(); } else { container = $(`#${key}`); }
+                            container.css("animation", `dynamicest-highlight-${values[3]} 1s ease 1`);
+                        }
                         statbar.style.width = values[0] + "%";
                         statbar.className = values[3];
                     }, 100 * i);
