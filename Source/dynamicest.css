@@ -188,3 +188,80 @@ mouse.tooltip-small, mouse.tooltip-centertop {
     top: -10%;
     opacity: 0.5;
 }
+
+
+/* === 时间进度条 =============================== */
+/* 24段垂直日进度条：0点在底部随时间向上点亮；挂于侧边栏右缘，收起/展开共用同一根 */
+.dynamicest-timebar {
+    position: absolute;
+    right: -9px;  /* 悬在侧边栏与正文之间 */
+    top: 70px;
+    height: 320px;
+    display: inline-flex;
+    flex-direction: column-reverse;
+    gap: 2px;
+    width: 6px;
+    pointer-events: all;
+}
+.dynamicest-tseg {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 1px;
+    border-radius: 2px;
+    background: var(--dynamicest-hour-dim);  /* 未到的时段：本段颜色低透明度打底 */
+    transform-origin: 50% 100%;
+}
+.dynamicest-tseg.lit {
+    background: var(--dynamicest-hour-color);
+    box-shadow: 0 0 4px var(--dynamicest-hour-color);
+}
+.dynamicest-tseg-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 2px;
+    background: var(--dynamicest-hour-color);
+    box-shadow: 0 0 5px var(--dynamicest-hour-color);
+    transform-origin: 50% 100%;
+    animation: dynamicest-tseg-pulse 2s ease-in-out infinite;
+}
+@keyframes dynamicest-tseg-pulse {
+    50% { filter: brightness(1.6); }
+}
+.dynamicest-tseg-fill.zap {
+    animation: dynamicest-tseg-zap 0.4s ease backwards, dynamicest-tseg-pulse 2s ease-in-out 0.4s infinite;
+}
+@keyframes dynamicest-tseg-zap {
+    0% { transform: scaleX(0.2); filter: brightness(2.5); }
+    60% { transform: scaleX(1.6); filter: brightness(1.6); }
+    100% { transform: scaleX(1); filter: brightness(1); }
+}
+.dynamicest-tseg.pop {
+    animation: dynamicest-tseg-pop 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+}
+@keyframes dynamicest-tseg-pop {
+    0% { transform: scaleY(0.2); filter: brightness(0.6); background-color: var(--dynamicest-hour-dim); box-shadow: none; }
+    30% { transform: scaleY(2.2); filter: brightness(3) saturate(0); background-color: #fff; box-shadow: 0 0 8px 2px #fff; }
+    100% { transform: scaleY(1); filter: brightness(1); }
+}
+.dynamicest-tseg.reset {
+    animation: dynamicest-tseg-reset 0.6s ease backwards;
+}
+@keyframes dynamicest-tseg-reset {
+    0% { transform: scaleY(1); filter: brightness(1); background-color: var(--dynamicest-hour-color); box-shadow: 0 0 4px var(--dynamicest-hour-color); }  /* 起步为点亮态：烧尽前整条是满格，白色波扫到谁谁才熄灭 */
+    30% { transform: scaleY(1.5); filter: brightness(3) saturate(0); background-color: #fff; box-shadow: 0 0 8px 2px #fff; }
+    55% { transform: scaleY(1); filter: brightness(0.5); background-color: var(--dynamicest-hour-dim); box-shadow: none; }
+    100% { filter: brightness(1); }  /* 背景从55%起过渡回各自自然色：已过时段复亮，未到时段归暗 */
+}
+.dynamicest-timebar.kick {
+    animation: dynamicest-tb-kick 0.5s ease;
+}
+@keyframes dynamicest-tb-kick {
+    30% { filter: brightness(1.8) drop-shadow(0 0 6px rgba(255, 210, 120, 0.8)); }
+}
+@media screen and (max-width: 1136px) {
+    #story {
+        margin-left: 19.5em;
+    }
+}

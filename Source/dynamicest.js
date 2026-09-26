@@ -85,6 +85,7 @@ Dynamicest.onPassageRender = function (ev) {
     Dynamicest.DisplayFoldClose = false;
 
     setTimeout(() => {
+        Dynamicest.updateTimeBar();  // 时间进度条随页面渲染重建
         Dynamicest.LoadStats();
         Dynamicest.LoadMoney();
         Dynamicest.LoadValues();
@@ -712,7 +713,7 @@ Dynamicest.LoadSocials = function() {
                 display[relation_class_id].push([relation_box, relation_box]);  // 格式：都是现在的，这个是新NPC的出现
                 display_num += 1;
             };
-            NewRelations[relation_title] = relation_box;  // 不论前一个是否存在，都要保存
+            NewRelations[relation_title] = relation_box.cloneNode(true);  // 不论前一个是否存在，都要保存；存快照防止弹窗动画改写元素导致重复弹出
         }
     }
 
@@ -763,7 +764,7 @@ Dynamicest.LoadCharacteristics = function() {
                 display[characteristic_class_id].push([LastCharacteristic, characteristic_box]);  // 格式：原来的, 现在的
                 display_num += 1;
             }
-            NewCharacteristics[characteristic_title] = characteristic_box  // 不论前一个是否存在，都要保存
+            NewCharacteristics[characteristic_title] = characteristic_box.cloneNode(true)  // 不论前一个是否存在，都要保存；存快照防止弹窗动画改写元素导致重复弹出
         }
     };
 
@@ -810,7 +811,7 @@ Dynamicest.LoadTraits = function() {
                 display[trait_class_id].push([trait_box, trait_box]);  // 格式：都是现在的，这个是新特质的出现
                 display_num += 1;
             };
-            NewTraits[trait_title] = trait_box;  // 不论前一个是否存在，都要保存
+            NewTraits[trait_title] = trait_box.cloneNode(true);  // 不论前一个是否存在，都要保存；存快照防止弹窗动画改写元素导致重复弹出
         }
     }
 
@@ -1088,6 +1089,91 @@ Dynamicest.UnfoldDisplay = function() {
                 Dynamicest.FinishList(class_id, -800);
             }
         }
+    }
+};
+
+// === 时间进度条 ===============================
+// 24段日进度条：0点在底部随时间向上点亮；各时段自带晨昏基色，未到的时段以低透明度打底
+Dynamicest.TimeBarHour = null;  // 上次渲染的小时数
+Dynamicest.TimeBarStamp = null;  // 上次渲染的时间戳（Time.date.timeStamp），用于区分跨午夜与回溯
+Dynamicest.TimeBarTimer = null;  // 跨天二段动画（烧尽）的调度
+
+Dynamicest.hourColor = function(h) {
+    return h < 6 ? "#4f6ab5" : h < 9 ? "#d98a44" : h < 17 ? "#e5c04b" : h < 20 ? "#d4693f" : "#4f6ab5";
+};
+
+// 生成分段HTML：popFrom为依次爆闪点亮的起始时段，topped为冲顶全亮，roll为跨天烧尽复亮
+Dynamicest.timeBarHTML = function(hour, minute, popFrom, roll, topped) {
+    const dim = (hex) => {
+        const n = parseInt(hex.slice(1), 16);
+        return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},0.16)`;
+    };
+    let html = "";
+    for (let h = 0; h < 24; h++) {
+        const color = Dynamicest.hourColor(h);
+        let style = `--dynamicest-hour-color:${color};--dynamicest-hour-dim:${dim(color)};`;
+        let class_ = "dynamicest-tseg";
+        if (topped || h < hour) {  // 冲顶时全条点亮
+            class_ += " lit";
+            if (popFrom !== null && h >= popFrom) {  // 新点亮的时段依次爆闪，一次跳过数小时则形成级联
+                class_ += " pop";
+                style += `animation-delay:${(h - popFrom) * 80}ms;`;
+            }
+        } else if (h === hour) {
+            class_ += " charging";
+        }
+        if (roll) {  // 跨天：从下往上烧尽，已过时段再缓缓复亮
+            class_ += " reset";
+            style += `animation-delay:${h * 80}ms;`;
+        }
+        html += `<div class="${class_}" style="${style}">`;
+        if (!topped && h === hour) html += `<div class="dynamicest-tseg-fill${popFrom !== null ? " zap" : ""}" style="height:${Math.round(minute / 60 * 100)}%"></div>`;
+        html += `</div>`;
+    }
+    return html;
+};
+
+// 将进度条挂入侧边栏右缘（收起/展开共用同一根，悬在侧边栏与正文之间）
+Dynamicest.updateTimeBar = function() {
+    if (typeof Time === "undefined" || !Number.isFinite(Time.hour) || !Number.isFinite(Time.minute)) return;
+    const uiBar = document.getElementById("ui-bar");
+    if (!uiBar) return;
+    let bar = uiBar.querySelector(".dynamicest-timebar");
+    if (!bar) {
+        uiBar.insertAdjacentHTML("beforeend", `<div class="dynamicest-timebar" tooltip="一天时间进度 · 每格一小时"></div>`);
+        bar = uiBar.querySelector(".dynamicest-timebar");
+    }
+
+    const hour = Time.hour, minute = Time.minute, stamp = Time.date.timeStamp;
+    const prev = Dynamicest.TimeBarHour;
+    const prevStamp = Dynamicest.TimeBarStamp;
+    Dynamicest.TimeBarHour = hour;
+    Dynamicest.TimeBarStamp = stamp;
+
+    const forward = prev !== null && stamp > prevStamp;  // 时间在前进（排除存档回溯/倒带）
+    const dayRoll = forward && hour < prev;  // 小时回卷但时间在前进 = 跨过午夜
+    const advanced = forward && !dayRoll && hour > prev;  // 同日跨过整点
+
+    if (dayRoll) {
+        // 第一段：先按原方式从睡前进度依次爆闪点亮到满格（冲顶）
+        bar.className = "dynamicest-timebar kick";
+        bar.innerHTML = Dynamicest.timeBarHTML(23, 59, prev, false, true);
+        bar.dataset.h = hour;
+        // 第二段：冲顶完成后整条从下往上烧尽，已过时段再缓缓复亮
+        // 触发点对齐最后一段爆闪的尾巴（(23-prev)*80+500ms 处结束），不留空等也不截断动画
+        Dynamicest.TimeBarTimer = setTimeout(() => {
+            const rollBar = document.querySelector("#ui-bar .dynamicest-timebar");
+            if (!rollBar || typeof Time === "undefined") return;
+            rollBar.className = "dynamicest-timebar";
+            rollBar.innerHTML = Dynamicest.timeBarHTML(Time.hour, Time.minute, null, true, false);
+            rollBar.dataset.h = Time.hour;
+        }, (24 - prev) * 80 + 430);
+    } else if (bar.dataset.h !== String(hour)) {  // 整点变化或首次构建时重建全部分段
+        bar.className = `dynamicest-timebar${advanced ? " kick" : ""}`;
+        bar.innerHTML = Dynamicest.timeBarHTML(hour, minute, advanced ? prev : null, false, false);
+        bar.dataset.h = hour;
+    } else if (bar.querySelector(".dynamicest-tseg-fill")) {  // 同一小时内仅更新充电进度，不重启动画
+        bar.querySelector(".dynamicest-tseg-fill").style.height = `${Math.round(minute / 60 * 100)}%`;
     }
 };
 
