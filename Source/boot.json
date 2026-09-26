@@ -1,7 +1,7 @@
 {
     "name": "Dynamicest",
     "nickName": "极致动态 - 动态弹窗提醒，不错过任何一个细微的变化",
-    "version": "3.2",
+    "version": "3.2.1",
     "styleFileList": [
         "dynamicest.css"
     ],

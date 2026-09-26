@@ -48,6 +48,11 @@
 			<br>
 			<<numberslider "$Dynamicest.Settings.DynamicestDisplayDuration" $Dynamicest.Settings.DynamicestDisplayDuration 0 5000 100>>
 			<br>
+			时间条粗细
+			<span class="tooltip-anchor linkBlue" tooltip="允许调节侧边栏右缘时间进度条的粗细（像素）">(?)</span>
+			<br>
+			<<numberslider "$Dynamicest.Settings.DynamicestTimeBarWidth" $Dynamicest.Settings.DynamicestTimeBarWidth 2 14 1>>
+			<br>
 			<br>
 			<input type="button" value="设置" onclick='Dynamicest.settingDynamicestDisplayApply()'/>
 			<input type="button" value="重设" onclick='Dynamicest.settingDynamicestDisplayReset()'/>
@@ -72,6 +77,13 @@
 				侧边栏数值改变闪烁动画（如出现卡顿请考虑关闭）
 			</label>
 			<span class="tooltip-anchor linkBlue" tooltip="勾选此项后即刻更改的数值，背景色会进行闪烁以提醒。可能加大设备负载，如出现卡顿请考虑关闭。">(?)</span>
+		</div>
+		<div class="settingsToggleItem">
+			<label>
+				<<print '<input type="checkbox" onchange="Dynamicest.setTimeBar(this.checked)"'+(V.Dynamicest.Settings.DynamicestTimeBar ? " checked" : "")+'>'>>
+				时间动态进度条
+			</label>
+			<span class="tooltip-anchor linkBlue" tooltip="侧边栏右缘的24小时进度条，随时间流逝点亮并伴随跨整点、跨天等动态特效，取消勾选立即隐藏">(?)</span>
 		</div>
 	</div>
 	<div class="p-2 text-align-center">

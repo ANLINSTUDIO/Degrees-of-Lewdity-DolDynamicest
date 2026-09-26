@@ -76,6 +76,8 @@ Dynamicest.onPassageRender = function (ev) {
     V.Dynamicest.Settings.DynamicestDisplayScale = V.Dynamicest.Settings.DynamicestDisplayScale ?? 1.0;
     V.Dynamicest.Settings.DynamicestDisplayOpacity = V.Dynamicest.Settings.DynamicestDisplayOpacity ?? 1.0;
     V.Dynamicest.Settings.DynamicestDisplayDuration = V.Dynamicest.Settings.DynamicestDisplayDuration ?? 1200;
+    V.Dynamicest.Settings.DynamicestTimeBar = V.Dynamicest.Settings.DynamicestTimeBar ?? true;
+    V.Dynamicest.Settings.DynamicestTimeBarWidth = V.Dynamicest.Settings.DynamicestTimeBarWidth ?? 6;
     Dynamicest.settingDynamicestDisplay();
 
     // 不允许首页出现，因为会导致首次判断出错
@@ -357,24 +359,51 @@ Dynamicest.GetList = function(id, class_) {
     id = id.trim();
     const display = Dynamicest.GetDisplay();
     let list = null;
+    // Debug 标记：记录 GetList 本次是创建新弹窗，还是复用同 id 的现有弹窗。
+    // 同类动态在已有弹窗移除前再次触发时，会复用该容器并继续追加内容。
+    // 仅用于追踪弹窗生命周期，不参与实际显示与队列逻辑。
+    // 不参与实际显示逻辑，仅用于追踪弹窗生命周期。
+    let isNew = false;
     if (id) {
         list = display.querySelector(`#box-dynamicest-list-${id}`);
         if (!list) {
             list = document.createElement("div");
             list.id = `box-dynamicest-list-${id}`;
+            isNew = true;
         };
     } else {
         list = document.createElement("div");
+        isNew = true;
     }
     list.className = "dynamicest-hide box-dynamicest "+class_;
     display.append(list);
+
+    // Debug：记录弹窗容器的取得/创建阶段，便于与各 Load* 和 FinishList 日志串联。
+    if (Dynamicest.Debug) {
+        console.log("[Dynamicest.GetList]", { id, class_, isNew, list });
+    }
+
     list.offsetHeight;  // 强制渲染隐藏状态后立即淡入，减少页面切换到弹出的延迟
     list.classList.remove("dynamicest-hide");
     return list
 };
+
 Dynamicest.FinishList = function(id, delay) {
     id = id.trim();
     let list = document.querySelector(`#box-dynamicest-list-${id}`);
+
+    // Debug：记录最终准备结束显示的弹窗内容，用于确认实际生成了什么。
+    if (Dynamicest.Debug) {
+        console.log("[Dynamicest.FinishList]", {
+            id,
+            delay,
+            list,
+            childCount: list ? list.children.length : 0,
+            text: list ? list.innerText : "",
+            html: list ? list.innerHTML : ""
+        });
+    }
+
     Dynamicest.Finish.push(id);
     if (list && !Dynamicest.Debug) {
         setTimeout(() => {
@@ -931,6 +960,22 @@ Dynamicest.LoadJournals = function() {
 };
 
 // === 侧栏动态 =================================
+// 侧栏中由其他模组注入的按钮、链接、表单及脚本/样式等交互 UI 不属于状态动态，
+// 避免将整组控件复制到 Dynamicest 弹窗与键过滤列表。
+Dynamicest.isInteractiveSideElement = function(el) {
+    if (!el) return false;
+
+    if (el.matches('style, script, link, template')) return true;
+    if (el.querySelector('style, script, link, template')) return true;
+
+    if (el.matches('input, button, select, textarea, label, a')) return true;
+    if (el.querySelector('input, button, select, textarea, label, a')) return true;
+
+    if (el.matches('[onclick], [onchange]')) return true;
+    if (el.querySelector('[onclick], [onchange]')) return true;
+
+    return false;
+};
 Dynamicest.LoadSides = function() {
     if (!V.Dynamicest.Settings.EnableSides) return;
 
@@ -938,11 +983,29 @@ Dynamicest.LoadSides = function() {
     const container = document.querySelector('#storyCaptionContent');
     const targetElement = document.querySelector('#sidebar-look-description');
     const elementsList = [];
+    // 保留扫描前的状态，仅供 Debug 对照本轮检测结果；不会影响 Side 判定。
+    const previousSides = Dynamicest.Debug ? [...Dynamicest.LastSides] : null;
+    const skippedInteractive = Dynamicest.Debug ? [] : null;
 
     if (container && targetElement) {
         const children = container.children;
         for (let child of children) {
             if (child === targetElement) break;
+            if (Dynamicest.isInteractiveSideElement(child)) {
+                // 交互 UI 不属于状态动态。Debug 模式下记录被排除的元素，
+                // 便于定位其他模组向侧栏注入按钮/链接/表单造成的兼容问题。
+                if (Dynamicest.Debug) {
+                    const skipped = {
+                        id: child.id || "",
+                        className: child.className || "",
+                        text: child.innerText || "",
+                        html: child.outerHTML
+                    };
+                    skippedInteractive.push(skipped);
+                    console.log("[Dynamicest.LoadSides] 跳过交互侧栏元素", skipped);
+                }
+                continue;
+            }
             if (!["<br>"].contains(child.outerHTML)) {
                 elementsList.push(child.innerHTML);
                 if (!Dynamicest.LastSides.contains(child.innerHTML)) {
@@ -950,6 +1013,20 @@ Dynamicest.LoadSides = function() {
                 }
             }
         }
+    }
+
+    // Debug 汇总：完整记录 LoadSides 本轮输入与判定结果。
+    // detected       = 通过交互元素过滤后，本轮识别到的全部 Side
+    // newSides       = 相比上一轮新增、将进入弹窗队列的 Side（保留 outerHTML）
+    // previousSides  = 上一轮保存的 Side，用于核对变化来源
+    // skippedInteractive = 本轮因交互 UI 规则被排除的元素
+    if (Dynamicest.Debug) {
+        console.log("[Dynamicest.LoadSides] 扫描结果", {
+            detected: elementsList,
+            newSides: Sides,
+            previousSides,
+            skippedInteractive
+        });
     }
 
     if (Sides.length > 0) {
@@ -1139,6 +1216,11 @@ Dynamicest.timeBarHTML = function(hour, minute, popFrom, roll, topped) {
 
 // 将进度条挂入侧边栏右缘（收起/展开共用同一根，悬在侧边栏与正文之间）
 Dynamicest.updateTimeBar = function() {
+    clearTimeout(Dynamicest.TimeBarTimer);
+    if (!V.Dynamicest.Settings.DynamicestTimeBar) {  // 时间动态关闭：移除进度条
+        document.querySelector("#ui-bar .dynamicest-timebar")?.remove();
+        return;
+    }
     if (typeof Time === "undefined" || !Number.isFinite(Time.hour) || !Number.isFinite(Time.minute)) return;
     const uiBar = document.getElementById("ui-bar");
     if (!uiBar) return;
@@ -1179,6 +1261,12 @@ Dynamicest.updateTimeBar = function() {
     } else if (bar.querySelector(".dynamicest-tseg-fill")) {  // 同一小时内仅更新充电进度，不重启动画
         bar.querySelector(".dynamicest-tseg-fill").style.height = `${Math.round(minute / 60 * 100)}%`;
     }
+};
+
+// 设置面板的时间动态开关，立即生效
+Dynamicest.setTimeBar = function(checked) {
+    V.Dynamicest.Settings.DynamicestTimeBar = checked;
+    Dynamicest.updateTimeBar();
 };
 
 // === 设置 ====================================
@@ -1236,6 +1324,7 @@ Dynamicest.settingDynamicestDisplay = function() {
     document.documentElement.style.setProperty('--dynamicest-display-scale', `${V.Dynamicest.Settings.DynamicestDisplayScale}`);
     document.documentElement.style.setProperty('--dynamicest-display-opacity', `${V.Dynamicest.Settings.DynamicestDisplayOpacity}`);
     document.documentElement.style.setProperty('--dynamicest-display-penetrate', `${(V.Dynamicest.Settings.DynamicestDisplayPenetrate&&!Dynamicest.Debug) ? "none": "all"}`);
+    document.documentElement.style.setProperty('--dynamicest-timebar-width', `${V.Dynamicest.Settings.DynamicestTimeBarWidth}px`);
 };
 Dynamicest.settingDynamicestDisplayApply = function() {
     Dynamicest.settingDynamicestDisplay()
@@ -1254,6 +1343,10 @@ Dynamicest.settingDynamicestDisplayReset = function() {
     V.Dynamicest.Settings.DynamicestDisplayDuration = 800;
     document.getElementById("numberslider-input-dynamicestsettingsdynamicestdisplayduration").value = V.Dynamicest.Settings.DynamicestDisplayDuration;
     document.getElementById("numberslider-value-dynamicestsettingsdynamicestdisplayduration").innerText = V.Dynamicest.Settings.DynamicestDisplayDuration;
+
+    V.Dynamicest.Settings.DynamicestTimeBarWidth = 6;
+    document.getElementById("numberslider-input-dynamicestsettingsdynamicesttimebarwidth").value = V.Dynamicest.Settings.DynamicestTimeBarWidth;
+    document.getElementById("numberslider-value-dynamicestsettingsdynamicesttimebarwidth").innerText = V.Dynamicest.Settings.DynamicestTimeBarWidth;
 
     Dynamicest.settingDynamicestDisplay()
 };

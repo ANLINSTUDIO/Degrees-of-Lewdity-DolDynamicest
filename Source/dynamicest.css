@@ -194,13 +194,13 @@ mouse.tooltip-small, mouse.tooltip-centertop {
 /* 24段垂直日进度条：0点在底部随时间向上点亮；挂于侧边栏右缘，收起/展开共用同一根 */
 .dynamicest-timebar {
     position: absolute;
-    right: -9px;  /* 悬在侧边栏与正文之间 */
+    right: calc(-1 * var(--dynamicest-timebar-width, 6px) - 3px);  /* 右缘随粗细外移，与侧边栏保持3px间距不变 */
     top: 70px;
     height: 320px;
     display: inline-flex;
     flex-direction: column-reverse;
     gap: 2px;
-    width: 6px;
+    width: var(--dynamicest-timebar-width, 6px);  /* 粗细由设置调节 */
     pointer-events: all;
 }
 .dynamicest-tseg {
@@ -259,9 +259,4 @@ mouse.tooltip-small, mouse.tooltip-centertop {
 }
 @keyframes dynamicest-tb-kick {
     30% { filter: brightness(1.8) drop-shadow(0 0 6px rgba(255, 210, 120, 0.8)); }
-}
-@media screen and (max-width: 1136px) {
-    #story {
-        padding-left: 0.5em;
-    }
 }
