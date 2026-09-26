@@ -43,10 +43,10 @@
 			<br>
 			<<numberslider "$Dynamicest.Settings.DynamicestDisplayOpacity" $Dynamicest.Settings.DynamicestDisplayOpacity 0.1 1 0.05>>
 			<br>
-			停留时间
+			停留时间 (毫秒)
 			<span class="tooltip-anchor linkBlue" tooltip="允许调节动态显示模块的停留时间（毫秒）">(?)</span>
 			<br>
-			<<numberslider "$Dynamicest.Settings.DynamicestDisplayDuration" $Dynamicest.Settings.DynamicestDisplayDuration 0 5000 100>>ms
+			<<numberslider "$Dynamicest.Settings.DynamicestDisplayDuration" $Dynamicest.Settings.DynamicestDisplayDuration 0 5000 100>>
 			<br>
 			<br>
 			<input type="button" value="设置" onclick='Dynamicest.settingDynamicestDisplayApply()'/>
