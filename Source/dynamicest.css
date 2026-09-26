@@ -262,6 +262,6 @@ mouse.tooltip-small, mouse.tooltip-centertop {
 }
 @media screen and (max-width: 1136px) {
     #story {
-        margin-left: 19.5em;
+        padding-left: 0.5em;
     }
 }

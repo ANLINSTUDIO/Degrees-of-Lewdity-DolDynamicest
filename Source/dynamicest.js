@@ -17,6 +17,7 @@ Dynamicest.LastSides = [];
 Dynamicest.HistorySides = new Set();
 Dynamicest.CheckedOld = null;  // 最近一次数值检查的旧值，供数字缓动插值使用
 Dynamicest.EaseDuration = 1000;  // 数字缓动插值时长（毫秒）
+Dynamicest.StatFlashNext = 0;  // 属性条闪烁的下一个时间槽（时间戳），跨渲染串行化约100ms的闪烁间隔
 
 
 Dynamicest.debugging = Dynamicest.setDubug = function(debug=true) {
@@ -215,7 +216,6 @@ Dynamicest.LoadStats = function() {
         delete T.statChanged;
     }
 
-    let i = 0;
     const stowed = document.getElementById("ui-bar").classList.contains("stowed");
     Dynamicest.LastState.keys().forEach(key => {
         const values = Dynamicest.LastState.get(key);
@@ -233,7 +233,12 @@ Dynamicest.LoadStats = function() {
             const statbar = meter_primary.children[0];
             if (statbar) {
                 if (statbar.style.width !== values[0] + "%") {
+                    // 闪烁槽位全局串行：快速连续渲染时各属性条也保持约100ms间隔，不会挤在一起同时闪
+                    Dynamicest.StatFlashNext = Math.max(Date.now(), Dynamicest.StatFlashNext);
+                    const delay = Dynamicest.StatFlashNext - Date.now();
+                    Dynamicest.StatFlashNext += 100;
                     setTimeout(() => {
+                        if (!statbar.isConnected) return;  // 该条已被新渲染替换，新条宽度已就位，跳过避免闪烁错乱
                         if (V.Dynamicest.Settings.DynamicestFlash) {
                             let container;
                             if (stowed) { container = $(`#${key+"stat"}`).parent(); } else { container = $(`#${key}`); }
@@ -241,8 +246,7 @@ Dynamicest.LoadStats = function() {
                         }
                         statbar.style.width = values[0] + "%";
                         statbar.className = values[3];
-                    }, 100 * i);
-                    i++;
+                    }, delay);
                 }
             }
         }
@@ -533,7 +537,7 @@ Dynamicest.applyTransition = function(oldElement, newElement) {
             newimg.style.opacity = 0;
             newimg.style.scale = 1.5;
             newimg.offsetHeight;
-            newimg.style.transition = '';
+            newimg.style.transition = 'opacity 0.8s ease, scale 0.8s cubic-bezier(0.4, 0, 0.2, 1)';  // 全局过渡已注释，图片缩放淡入自带过渡
             (img => setTimeout(() => {img.style.opacity = 1; img.style.scale = 1;}, 200 * index))(newimg);
         }
     }
