@@ -37,6 +37,7 @@
     transition: opacity 0.8s ease;
     overflow: auto;
     max-height: stretch;
+    scroll-behavior: smooth;  /* 弹窗分批展开时自动平滑下滑 */
     pointer-events: var(--dynamicest-display-penetrate);
     transform-origin: right top;
     scale: var(--dynamicest-display-scale);
@@ -45,12 +46,28 @@
 .display-dynamicest > .box-dynamicest > div {
     min-width: 45%;
 }
-.display-dynamicest * {
+/* .display-dynamicest * {
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
+} */
 .box-dynamicest {
     background-color: var(--850);
-    transition: opacity 0.8s ease;
+    transition: opacity 0.3s ease, height 0.3s ease, filter 0.3s ease;  /* 淡入与展开缓动加快 */
+}
+.box-dynamicest.dynamicest-hide {
+    transition: opacity 0.8s ease;  /* 淡出保持不变 */
+}
+/* 排队预览：高度固定20px、内容顶部对齐、超出裁剪并模糊，单击可提前展开 */
+.box-dynamicest.dynamicest-queued {
+    box-sizing: border-box;  /* 保证20px为实际渲染高度 */
+    height: 20px;
+    min-height: 20px;
+    max-height: 20px;
+    overflow: hidden;
+    align-content: start;
+    align-items: flex-start;
+    filter: blur(2px);
+    cursor: pointer;
+    pointer-events: all;  /* 穿透模式下仍可点击展开 */
 }
 .box-dynamicest .meter {
     z-index: 0;
@@ -80,6 +97,33 @@
 }
 .box-sides * {
     pointer-events: none;
+}
+/* 仪表条颜色差分高亮 */
+.display-dynamicest .meter {
+    position: relative;
+    overflow: hidden;
+}
+.dynamicest-diff-up,
+.dynamicest-diff-down {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: -1;  /* 垫在meter条的下面，不阻挡meter显示 */
+    pointer-events: none;
+    animation: dynamicest-diff 1.8s ease forwards;
+    opacity: 0.5;
+    transition: none;
+}
+.dynamicest-diff-up {
+    background-color: var(--green, green);
+}
+.dynamicest-diff-down {
+    background-color: var(--red, red);
+}
+@keyframes dynamicest-diff {
+    0% { opacity: 0.5; }
+    60% { opacity: 0.5; }
+    100% { opacity: 0; }
 }
 
 

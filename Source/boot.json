@@ -1,12 +1,15 @@
 {
     "name": "Dynamicest",
     "nickName": "极致动态 - 动态弹窗提醒，不错过任何一个细微的变化",
-    "version": "3.1",
+    "version": "3.2",
     "styleFileList": [
         "dynamicest.css"
     ],
     "scriptFileList": [
         "dynamicest.js"
+    ],
+    "scriptFileList_inject_early": [
+        "early-dynamicest.js"
     ],
     "tweeFileList": [
         "settings.twee"
