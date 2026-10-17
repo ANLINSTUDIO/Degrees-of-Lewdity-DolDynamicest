@@ -121,7 +121,7 @@ Dynamicest.onPassageRender = function (ev) {
 };
 
 Dynamicest.npc_appearance = function() {
-    if (V.Dynamicest.Settings.DynamicestDisplayPenetrate) {
+    if (V.Dynamicest.Settings.DynamicestShowNPCAppearance) {
         let name = T.nam;
         if (setup.NPCNameList_cn_name) {
             name = setup.NPCNameList_cn_name.split(`${T.nam},`)[1]?.split("|")[0]
