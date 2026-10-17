@@ -902,21 +902,21 @@ Dynamicest.LoadJournals = function() {
 
     // 单独适配智能手机
     if (!V.Dynamicest.Settings.FilterJournals.includes("获得手机")) {
-        if (window.PhoneMod) {
+        if (window.smartphone) {
             const phones = V.Phone?.Owned ? V.Phone.Owned.map(item => item.id): null;
             if (phones) {
                 phones.forEach(phoneid => {
                     if (Dynamicest.LastJournals["Phone.Owned"] && !Dynamicest.LastJournals["Phone.Owned"].contains(phoneid)) {
                         const phone = V.Phone.Owned.find(item => item.id === phoneid);
-                        const info = window.PhoneMod?.getPhoneConditionInfo(phone);
+                        const info = window.smartphone?.getPhoneConditionInfo(phone);
                         Journals.push(`
                             <<if ${phone.newnessmax > 0}>>
-                                [ ${window.PhoneMod?.getPhoneBattery(phone)}% ] 
+                                [ ${window.smartphone?.getPhoneBattery(phone)}% ] 
                             <<else>>
                                 [ --- ] 
                             <</if>>
                             一部${info.html}的 ${phone.model} ，官网售价为
-                            <span class='gold'>£${Math.round(window.PhoneMod?.getPhoneInfo(phone.model).price)}</span>。
+                            <span class='gold'>£${Math.round(window.smartphone?.getPhoneInfo(phone.model).price)}</span>。
                             <<if ${phone.stolen}>>
                                 <span class='red'>盗窃得来</span>
                                 <<if ${phone.usable}>>
