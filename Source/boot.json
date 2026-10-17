@@ -30,6 +30,12 @@
                     "replace": "<<optionsinformation>><</replace>>\n\t\t<</button>><<dynamicestModTab>>"
                 },
                 {
+                    "tip": "衣柜修改",
+                    "passage": "Widgets Wardrobe",
+                    "findString": "\t<<run updateMoment()>>\n<</widget>>",
+                    "replace": "<<run window.Dynamicest?.LoadStats()>>\t<<run updateMoment()>>\n<</widget>>"
+                },
+                {
                     "tip": "替换 statbar、statbarinverted 和 paincaption",
                     "passage": "Widgets",
                     "findString": "<div @class=\"_statColor\" @style=\"'width:' + _percent + '%'\"></div>",
