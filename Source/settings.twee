@@ -73,6 +73,13 @@
 		</div>
 		<div class="settingsToggleItem">
 			<label>
+				<<checkbox "$Dynamicest.Settings.DynamicestShowCourseProgress" false true autocheck>>
+				课程进度提醒
+			</label>
+			<span class="tooltip-anchor linkBlue" tooltip="勾选此项后进入学校教室时会自动弹窗提醒其对应课程进度">(?)</span>
+		</div>
+		<div class="settingsToggleItem">
+			<label>
 				<<checkbox "$Dynamicest.Settings.DynamicestFlash" false true autocheck>>
 				侧边栏数值改变闪烁动画（如出现卡顿请考虑关闭）
 			</label>

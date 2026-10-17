@@ -71,6 +71,7 @@ Dynamicest.onPassageRender = function (ev) {
 
     V.Dynamicest.Settings.DynamicestDisplayPenetrate = V.Dynamicest.Settings.DynamicestDisplayPenetrate ?? true;
     V.Dynamicest.Settings.DynamicestShowNPCAppearance = V.Dynamicest.Settings.DynamicestShowNPCAppearance ?? true;
+    V.Dynamicest.Settings.DynamicestShowCourseProgress = V.Dynamicest.Settings.DynamicestShowCourseProgress ?? true;
     V.Dynamicest.Settings.DynamicestFlash = V.Dynamicest.Settings.DynamicestFlash ?? true;
     V.Dynamicest.Settings.DynamicestDisplayTop = V.Dynamicest.Settings.DynamicestDisplayTop ?? 10;
     V.Dynamicest.Settings.DynamicestDisplayScale = V.Dynamicest.Settings.DynamicestDisplayScale ?? 1.0;
@@ -130,6 +131,26 @@ Dynamicest.npc_appearance = function() {
             const relation_title = Object.keys(Dynamicest.LastRelations).find((key) => key.includes(name));
             if (relation_title) {
                 T.DynamicestSocialsForceShow = [...T.DynamicestSocialsForceShow??[], relation_title]
+            }
+        }
+    }
+}
+
+Dynamicest.lesson_start = function() {
+    if (V.Dynamicest.Settings.DynamicestShowCourseProgress) {
+        let name;
+        switch (V.passage) {
+            case "Science Classroom": name = "科学"; break;
+            case "History Classroom": name = "历史"; break;
+            case "Maths Classroom": name = "数学"; break;
+            case "English Classroom": name = "语文"; break;
+            case "Housekeeping Classroom": name = "家务"; break;
+            case "School Pool": name = "游泳"; break;
+        }
+        if (name) {
+            const characteristics_title = Object.keys(Dynamicest.LastCharacteristics).find((key) => key.includes(name));
+            if (characteristics_title) {
+                T.DynamicestCharacteristicsForceShow = [...T.DynamicestCharacteristicsForceShow??[], characteristics_title]
             }
         }
     }
@@ -790,7 +811,7 @@ Dynamicest.LoadCharacteristics = function() {
             if (characteristic_box.parentElement?.id === "base-characteristics") content_changed = content_changed || LastCharacteristic.querySelector(".meter > div")?.style.cssText !== characteristic_box.querySelector(".meter > div")?.style.cssText;  // 单独适配核心属性
             if (characteristic_box.parentElement?.className === "sex-diagram-box") characteristic_class_id = "sex-diagram";  // 单独适配性技能
 
-            if (LastCharacteristic && content_changed) {  // 有改动，动态展示，否则不变
+            if (LastCharacteristic && (content_changed || T.DynamicestCharacteristicsForceShow?.includes(characteristic_title))) {  // 有改动，动态展示，否则不变
                 if (!display.hasOwnProperty(characteristic_class_id)) {
                     display[characteristic_class_id] = [];
                 }
@@ -1063,6 +1084,8 @@ Dynamicest.CheckValue = function(key, value) {
 Dynamicest.LoadValues = function() {
     const Values = [];
     const funcs = [];
+
+    Dynamicest.lesson_start();  // 检测课程进度
 
     if (!V.Dynamicest.Settings.FilterComdoms && Dynamicest.CheckValue("condoms", V.condoms)) Values.push({text: `
         <div style="display: flex">
