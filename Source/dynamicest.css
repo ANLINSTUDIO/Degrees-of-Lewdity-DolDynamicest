@@ -110,19 +110,19 @@
     bottom: 0;
     z-index: -1;  /* 垫在meter条的下面，不阻挡meter显示 */
     pointer-events: none;
-    animation: dynamicest-diff 1.8s ease forwards;
+    animation: dynamicest-diff 2.25s ease forwards;
     opacity: 0.5;
     transition: none;
 }
 .dynamicest-diff-up {
-    background-color: var(--green, green);
+    background-color: var(--green);
 }
 .dynamicest-diff-down {
-    background-color: var(--red, red);
+    background-color: var(--000);
 }
 @keyframes dynamicest-diff {
     0% { opacity: 0.5; }
-    60% { opacity: 0.5; }
+    80% { opacity: 0.5; }
     100% { opacity: 0; }
 }
 

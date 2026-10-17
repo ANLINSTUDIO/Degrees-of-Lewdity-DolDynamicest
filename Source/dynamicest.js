@@ -617,11 +617,13 @@ Dynamicest.diffMeter = function(oldMeter, newMeter) {
     newBar.style.transition = "none";
     newBar.style.width = oldW + "%";
     newBar.offsetHeight;
-    newBar.style.transition = down
-        ? "width 1.3s cubic-bezier(0.4, 0, 0.2, 1) 0.5s, background-color 0.8s ease"
-        : "width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.8s ease";
-    newBar.style.width = newW + "%";
-    setTimeout(() => {newBar.style.transition = "";}, down ? 1800 : 1000);
+    setTimeout(() => {
+        newBar.style.transition = down
+            ? "width 1.3s cubic-bezier(0.4, 0, 0.2, 1) 0.5s, background-color 0.8s ease"
+            : "width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.8s ease";
+        newBar.style.width = newW + "%";
+        setTimeout(() => {newBar.style.transition = "";}, down ? 1800 : 1000);
+    }, 500);
 };
 // 配对遍历新旧元素的文本节点，对可插值的数字文本进行缓动
 Dynamicest.interpolateTree = function(oldElement, newElement) {
@@ -664,29 +666,31 @@ Dynamicest.interpolateText = function(oldNode, newNode) {
     };
     glow(1);
 
-    const startTime = performance.now();
-    const duration = Dynamicest.EaseDuration;
     newNode.nodeValue = oldText;  // 初始为旧值，随后缓动到新值
-    const frame = (currentTime) => {
-        const progress = Math.min((currentTime - startTime) / duration, 1);
-        const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
-        let text = "";
-        for (let i = 0; i < newParts.length; i += 2) {
-            text += newParts[i];
-            if (i + 1 < newParts.length) {
-                const value = oldNums[i >> 1] + (newNums[i >> 1] - oldNums[i >> 1]) * easeProgress;
-                text += value.toFixed(decimals[i >> 1]);
+    setTimeout(() => {
+        const startTime = performance.now();
+        const duration = Dynamicest.EaseDuration;
+        const frame = (currentTime) => {
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+            let text = "";
+            for (let i = 0; i < newParts.length; i += 2) {
+                text += newParts[i];
+                if (i + 1 < newParts.length) {
+                    const value = oldNums[i >> 1] + (newNums[i >> 1] - oldNums[i >> 1]) * easeProgress;
+                    text += value.toFixed(decimals[i >> 1]);
+                }
             }
-        }
-        newNode.nodeValue = text;
-        glow(1 - progress);
-        if (progress < 1) requestAnimationFrame(frame);
-        else {
-            newNode.nodeValue = newText;
-            glow(0);
-        }
-    };
-    requestAnimationFrame(frame);
+            newNode.nodeValue = text;
+            glow(1 - progress);
+            if (progress < 1) requestAnimationFrame(frame);
+            else {
+                newNode.nodeValue = newText;
+                glow(0);
+            }
+        };
+        requestAnimationFrame(frame);
+    }, 500)
 };
 // 已知旧值与新值时，对容器中显示新值的文本节点进行缓动插值
 Dynamicest.easeTextValue = function(container, oldValue, newValue) {
@@ -709,22 +713,24 @@ Dynamicest.easeTextValue = function(container, oldValue, newValue) {
             };
             glow(1);
 
-            const startTime = performance.now();
-            const duration = Dynamicest.EaseDuration;
             node.nodeValue = prefix + oldValue + suffix;  // 初始为旧值
-            const frame = (currentTime) => {
-                const progress = Math.min((currentTime - startTime) / duration, 1);
-                const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
-                const value = oldValue + (newValue - oldValue) * easeProgress;
-                node.nodeValue = prefix + value.toFixed(decimals) + suffix;
-                glow(1 - progress);
-                if (progress < 1) requestAnimationFrame(frame);
-                else {
-                    node.nodeValue = prefix + newValue + suffix;
-                    glow(0);
-                }
-            };
-            requestAnimationFrame(frame);
+            setTimeout(() => {
+                const startTime = performance.now();
+                const duration = Dynamicest.EaseDuration;
+                const frame = (currentTime) => {
+                    const progress = Math.min((currentTime - startTime) / duration, 1);
+                    const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                    const value = oldValue + (newValue - oldValue) * easeProgress;
+                    node.nodeValue = prefix + value.toFixed(decimals) + suffix;
+                    glow(1 - progress);
+                    if (progress < 1) requestAnimationFrame(frame);
+                    else {
+                        node.nodeValue = prefix + newValue + suffix;
+                        glow(0);
+                    }
+                };
+                requestAnimationFrame(frame);
+            }, 500);
             return;
         }
     }
